@@ -9,25 +9,21 @@ class ElectricCurrent extends PhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    /**
-     * Configure all the standard units of measure
-     * to which this quantity can be converted.
-     *
-     * @return void
-     */
-    public function __construct($value, $unit)
-    {
-        parent::__construct($value, $unit);
+    static protected $unitDefinitions = [];
 
+    static protected $hasBeenInitialized = false;
+
+    static protected function registerDefaultUnitsOfMeasure()
+    {
         // Ampere
         $ampere = UnitOfMeasure::nativeUnitFactory('A');
         $ampere->addAlias('amp');
         $ampere->addAlias('amps');
         $ampere->addAlias('ampere');
         $ampere->addAlias('amperes');
-        $this->registerUnitOfMeasure($ampere);
+        static::registerUnitOfMeasure($ampere);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $ampere,
             1,
             '%pA',

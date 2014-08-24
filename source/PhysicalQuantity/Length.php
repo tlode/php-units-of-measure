@@ -9,25 +9,21 @@ class Length extends PhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    /**
-     * Configure all the standard units of measure
-     * to which this quantity can be converted.
-     *
-     * @return void
-     */
-    public function __construct($value, $unit)
-    {
-        parent::__construct($value, $unit);
+    static protected $unitDefinitions = [];
 
+    static protected $hasBeenInitialized = false;
+
+    static protected function registerDefaultUnitsOfMeasure()
+    {
         // Meter
         $meter = UnitOfMeasure::nativeUnitFactory('m');
         $meter->addAlias('meter');
         $meter->addAlias('meters');
         $meter->addAlias('metre');
         $meter->addAlias('metres');
-        $this->registerUnitOfMeasure($meter);
+        static::registerUnitOfMeasure($meter);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $meter,
             1,
             '%pm',
@@ -43,24 +39,24 @@ class Length extends PhysicalQuantity
         $newUnit = UnitOfMeasure::linearUnitFactory('ft', 0.3048);
         $newUnit->addAlias('foot');
         $newUnit->addAlias('feet');
-        $this->registerUnitOfMeasure($newUnit);
+        static::registerUnitOfMeasure($newUnit);
 
         // Inch
         $newUnit = UnitOfMeasure::linearUnitFactory('in', 0.0254);
         $newUnit->addAlias('inch');
         $newUnit->addAlias('inches');
-        $this->registerUnitOfMeasure($newUnit);
+        static::registerUnitOfMeasure($newUnit);
 
         // Mile
         $newUnit = UnitOfMeasure::linearUnitFactory('mi', 1609.344);
         $newUnit->addAlias('mile');
         $newUnit->addAlias('miles');
-        $this->registerUnitOfMeasure($newUnit);
+        static::registerUnitOfMeasure($newUnit);
 
         // Yard
         $newUnit = UnitOfMeasure::linearUnitFactory('yd', 0.9144);
         $newUnit->addAlias('yard');
         $newUnit->addAlias('yards');
-        $this->registerUnitOfMeasure($newUnit);
+        static::registerUnitOfMeasure($newUnit);
     }
 }

@@ -5,17 +5,110 @@ namespace PhpUnitsOfMeasureTest;
 use PhpUnitsOfMeasure\PhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasureInterface;
 
+class Woogosity extends PhysicalQuantity
+{
+    static protected $unitDefinitions = [];
+
+    static protected $hasBeenInitialized = false;
+
+    static protected function registerDefaultUnitsOfMeasure()
+    {
+    }
+}
+
 class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @before
+     */
+    public function resetStaticProperty()
+    {
+        $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Woogosity'))
+            ->getProperty('unitDefinitions');
+        $property->setAccessible(true);
+        $property->setValue([]);
+
+        $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Woogosity'))
+            ->getProperty('hasBeenInitialized');
+        $property->setAccessible(true);
+        $property->setValue(false);
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
+     * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
+     */
+    public function testRegisterUnitFailsOnDuplicateName()
+    {
+        $value = new Woogosity(1.234, 'quatloos');
+
+        $newUnit = $this->getMockUnitOfMeasure('quatloos');
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        $newUnit = $this->getMockUnitOfMeasure('quatloos');
+        Woogosity::registerUnitOfMeasure($newUnit);
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
+     * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
+     */
+    public function testRegisterUnitFailsOnDuplicateAlias()
+    {
+        $value = new Woogosity(1.234, 'quatloos');
+
+        $newUnit = $this->getMockUnitOfMeasure('quatloos');
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        $newUnit = $this->getMockUnitOfMeasure('galimpwid', ['quatloos']);
+        Woogosity::registerUnitOfMeasure($newUnit);
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
+     */
+    public function testGetSupportedUnits()
+    {
+        $value = new Woogosity(1.234, 'quatloos');
+
+        // Quatloos
+        $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        // Schmoos
+        $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        $this->assertSame(['quatloos', 'schmoos'], $value->getSupportedUnits());
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
+     */
+    public function testGetSupportedUnitsWithAliases()
+    {
+        $value = new Woogosity(1.234, 'quatloos');
+
+        // Quatloos
+        $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        // Schmoos
+        $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
+        Woogosity::registerUnitOfMeasure($newUnit);
+
+        $this->assertSame(
+            ['quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
+            $value->getSupportedUnits(true)
+        );
+    }
+
     /**
      * @covers \PhpUnitsOfMeasure\PhysicalQuantity::__construct
      */
     public function testInstantiateNewUnit()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
+        $value = new Woogosity(1.234, 'quatloos');
     }
 
     /**
@@ -24,10 +117,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstantiateNewUnitNonNumericValue()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            ['string', 'quatloos']
-        );
+        $value = new Woogosity('string', 'quatloos');
     }
 
     /**
@@ -36,10 +126,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstantiateNewUnitNonStringUnit()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 42]
-        );
+        $value = new Woogosity(1.234, 42);
     }
 
     /**
@@ -47,14 +134,11 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
      */
     public function testToString()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
+        $value = new Woogosity(1.234, 'quatloos');
 
         // Quatloos
         $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $value->registerUnitOfMeasure($newUnit);
+        Woogosity::registerUnitOfMeasure($newUnit);
 
         $this->assertSame('1.234 quatloos', (string) $value);
     }
@@ -66,66 +150,27 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnitConverts()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
+        $value = new Woogosity(1.234, 'quatloos');
 
         // Quatloos
         $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $newUnit->expects($this->once())
+        $newUnit->expects($this->any())
             ->method('convertValueToNativeUnitOfMeasure')
             ->will($this->returnValue(1.234));
 
-        $value->registerUnitOfMeasure($newUnit);
+        Woogosity::registerUnitOfMeasure($newUnit);
 
         // Galactic Imperial Widgets (let's say it's defined as 2 quatloos)
         $newUnit = $this->getMockUnitOfMeasure('galimpwid');
-        $newUnit->expects($this->once())
+        $newUnit->expects($this->any())
             ->method('convertValueFromNativeUnitOfMeasure')
             ->will($this->returnValue(2.468));
 
-        $value->registerUnitOfMeasure($newUnit);
+        Woogosity::registerUnitOfMeasure($newUnit);
 
         $valueInGalimpwids = $value->toUnit('galimpwid');
 
         $this->assertSame(2.468, $valueInGalimpwids);
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
-     * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
-     */
-    public function testRegisterUnitFailsOnDuplicateName()
-    {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
-
-        $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $value->registerUnitOfMeasure($newUnit);
-
-        $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $value->registerUnitOfMeasure($newUnit);
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
-     * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
-     */
-    public function testRegisterUnitFailsOnDuplicateAlias()
-    {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
-
-        $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $value->registerUnitOfMeasure($newUnit);
-
-        $newUnit = $this->getMockUnitOfMeasure('galimpwid', ['quatloos']);
-        $value->registerUnitOfMeasure($newUnit);
     }
 
     /**
@@ -134,61 +179,13 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnknownUnit()
     {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
+        $value = new Woogosity(1.234, 'quatloos');
 
         // Quatloos
         $newUnit = $this->getMockUnitOfMeasure('quatloos');
-        $value->registerUnitOfMeasure($newUnit);
+        Woogosity::registerUnitOfMeasure($newUnit);
 
         $valueInGalimpwids = $value->toUnit('galimpwid');
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
-     */
-    public function testgetSupportedUnits()
-    {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
-
-        // Quatloos
-        $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
-        $value->registerUnitOfMeasure($newUnit);
-
-        // Schmoos
-        $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
-        $value->registerUnitOfMeasure($newUnit);
-
-        $this->assertSame(['quatloos', 'schmoos'], $value->getSupportedUnits());
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
-     */
-    public function testgetSupportedUnitsWithAliases()
-    {
-        $value = $this->getMockForAbstractClass(
-            '\PhpUnitsOfMeasure\PhysicalQuantity',
-            [1.234, 'quatloos']
-        );
-
-        // Quatloos
-        $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
-        $value->registerUnitOfMeasure($newUnit);
-
-        // Schmoos
-        $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
-        $value->registerUnitOfMeasure($newUnit);
-
-        $this->assertSame(
-            ['quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-            $value->getSupportedUnits(true)
-        );
     }
 
     /**

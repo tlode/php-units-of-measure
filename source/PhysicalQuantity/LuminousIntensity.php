@@ -9,22 +9,18 @@ class LuminousIntensity extends PhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    /**
-     * Configure all the standard units of measure
-     * to which this quantity can be converted.
-     *
-     * @return void
-     */
-    public function __construct($value, $unit)
-    {
-        parent::__construct($value, $unit);
+    static protected $unitDefinitions = [];
 
+    static protected $hasBeenInitialized = false;
+
+    static protected function registerDefaultUnitsOfMeasure()
+    {
         // Candela
         $candela = UnitOfMeasure::nativeUnitFactory('cd');
         $candela->addAlias('candela');
-        $this->registerUnitOfMeasure($candela);
+        static::registerUnitOfMeasure($candela);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $candela,
             1,
             '%pcd',

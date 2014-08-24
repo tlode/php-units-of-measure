@@ -11,7 +11,7 @@ trait HasSIUnitsTrait
     /**
      * The standard set of SI prefixes
      */
-    protected $siPrefixes = [
+    static protected $siPrefixes = [
         [
             'abbr_prefix' => 'Y',
             'long_prefix' => 'yotta',
@@ -147,7 +147,7 @@ trait HasSIUnitsTrait
      * @param  string        $namePattern        The pattern to apply to the base unit's name to generate a new SI unit name
      * @param  array         $aliasPatterns      The collection of alias patterns to use in generating a new SI unit's aliases
      */
-    protected function addMissingSIPrefixedUnits(
+    static protected function addMissingSIPrefixedUnits(
         UnitOfMeasure $siUnit,
         $toBaseSiUnitFactor,
         $namePattern,
@@ -157,10 +157,10 @@ trait HasSIUnitsTrait
         $noPrefixToNativeUnitFactor = $siUnit->convertValueToNativeUnitOfMeasure(1) * $toBaseSiUnitFactor;
 
         // Identify the current set of unit names, so we can avoid duplicates
-        $existingUnitNames = $this->getSupportedUnits(true);
+        $existingUnitNames = static::getSupportedUnits(true);
 
         // For each of the standard SI prefixes, attempt to register a new unit of measure
-        foreach ($this->siPrefixes as $prefixDefinition) {
+        foreach (static::$siPrefixes as $prefixDefinition) {
 
             // Build a closure for resolving a pattern into a unit name
             $parsePattern = function ($pattern) use ($prefixDefinition) {
@@ -196,7 +196,7 @@ trait HasSIUnitsTrait
             }
 
             // Add the new unit of measure to this physical quantity
-            $this->registerUnitOfMeasure($newUnit);
+            static::registerUnitOfMeasure($newUnit);
         }
     }
 }

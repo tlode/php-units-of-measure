@@ -9,23 +9,19 @@ class Angle extends PhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    /**
-     * Configure all the standard units of measure
-     * to which this quantity can be converted.
-     *
-     * @return void
-     */
-    public function __construct($value, $unit)
-    {
-        parent::__construct($value, $unit);
+    static protected $unitDefinitions = [];
 
+    static protected $hasBeenInitialized = false;
+
+    static protected function registerDefaultUnitsOfMeasure()
+    {
         // Radians
         $radian = UnitOfMeasure::nativeUnitFactory('rad');
         $radian->addAlias('radian');
         $radian->addAlias('radians');
-        $this->registerUnitOfMeasure($radian);
+        static::registerUnitOfMeasure($radian);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $radian,
             1,
             '%prad',
@@ -40,9 +36,9 @@ class Angle extends PhysicalQuantity
         $degree->addAlias('°');
         $degree->addAlias('degree');
         $degree->addAlias('degrees');
-        $this->registerUnitOfMeasure($degree);
+        static::registerUnitOfMeasure($degree);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $degree,
             1,
             '%pdeg',
@@ -60,7 +56,7 @@ class Angle extends PhysicalQuantity
         $arcminute->addAlias('amin');
         $arcminute->addAlias('am');
         $arcminute->addAlias('MOA');
-        $this->registerUnitOfMeasure($arcminute);
+        static::registerUnitOfMeasure($arcminute);
 
         // Arcsecond
         $arcsecond = UnitOfMeasure::linearUnitFactory('arcsec', M_PI / 180 / 3600);
@@ -69,9 +65,9 @@ class Angle extends PhysicalQuantity
         $arcminute->addAlias('arcseconds');
         $arcsecond->addAlias('asec');
         $arcsecond->addAlias('as');
-        $this->registerUnitOfMeasure($arcsecond);
+        static::registerUnitOfMeasure($arcsecond);
 
-        $this->addMissingSIPrefixedUnits(
+        static::addMissingSIPrefixedUnits(
             $arcsecond,
             1,
             '%Parcsec',
