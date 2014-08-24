@@ -61,7 +61,7 @@ interface UnitOfMeasureInterface
      * this unit of measure.
      *
      * The native unit of measure can be anything, but all the
-     * units of measure for a given PhysicalQuantity must agree
+     * units of measure for a given physical quantity must agree
      * on what that unit is.
      *
      * @param  float $value The quantity to convert from this unit of measure
@@ -77,7 +77,7 @@ interface UnitOfMeasureInterface
      * native unit of measure.
      *
      * The native unit of measure can be anything, but all the
-     * units of measure for a given PhysicalQuantity must agree
+     * units of measure for a given physical quantity must agree
      * on what that unit is.
      *
      * @param  float $value The quantity to convert from the native unit of measure

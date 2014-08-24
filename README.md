@@ -64,7 +64,7 @@ echo $quantity; // '6 lbs'
 ```
 
 ### Arithmetic Operators
-There's also support for addition and subtraction.  The values of `PhysicalQuantity` objects are immutable, and so these arithmetic methods return new quantity objects representing the results:
+There's also support for addition and subtraction.  The values of objects which implement `PhysicalQuantityInterface` are immutable, and so these arithmetic methods return new quantity objects representing the results:
 
 ``` php
 use PhpUnitsOfMeasure\PhysicalQuantity\Volume;
@@ -133,7 +133,7 @@ $megameter->addAlias('Megametre');
 $length->registerUnitOfMeasure($megameter);
 ```
 
-The other convenience method is a special case of the above scaling factor factory method where the scaling factor is set to exactly 1, and serves as a convenient way of generating the native unit of measure.  All `PhysicalQuantity` classes must have one and only one native unit, so this method will probably only be called once per `PhysicalQuantity` class:
+The other convenience method is a special case of the above scaling factor factory method where the scaling factor is set to exactly 1, and serves as a convenient way of generating the native unit of measure.  All classes which implement `PhysicalQuantityInterface` must have one and only one native unit, so this method will probably only be called once per class:
 
 ``` php
 $meter = UnitOfMeasure::nativeUnitFactory('m');
@@ -143,7 +143,7 @@ $length->registerUnitOfMeasure($meter);
 ```
 
 ##### Automatically Generating Metric Units
-For units that use the metric system, there's a convenience trait available for `PhysicalQuantity` classes which will automatically generate the full continuum of metric units from a single unit.  For instance:
+For units that use the metric system, there's a convenience trait available for classes which implement `PhysicalQuantityInterface' which will automatically generate the full continuum of metric units from a single unit.  For instance:
 
 ``` php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
@@ -180,14 +180,14 @@ class Mass extends PhysicalQuantity
 
 Here we're generating the native unit for mass, kilogram, adding it to the quantity as usual, and then using it to generate the spectrum of SI units by calling the `addMissingSIPrefixedUnits()` method provided by the `HasSIUnitsTrait` trait.
 
-Of note, the second parameter (1e-3) is denoting that while kilograms are the native unit for Mass, there's a factor of 1/1000 between the kilogram and the base metric unit of mass: the gram.  For units such as seconds or meters where the native unit for the `PhysicalQuantity` class is also the base unit for the metric prefix system, this factor would be 1.
+Of note, the second parameter (1e-3) is denoting that while kilograms are the native unit for Mass, there's a factor of 1/1000 between the kilogram and the base metric unit of mass: the gram.  For units such as seconds or meters where the native unit for the physical quantity is also the base unit for the metric prefix system, this factor would be 1.
 
 The 3rd and 4th parameters contain templates for the units' names and alternate aliases, respectively. The replacement strings '%p' and '%P' are used to denote the abbreviated and long-form metric prefixes.  For instance, '%pg' would generate the series `..., 'mg', 'cg', 'dg', 'g', ...`, while the template '%Pgram' would generate the series `..., 'milligram', 'centigram', 'decigram', 'gram', ...` .
 
 #### Permanently Adding a New Unit of Measure to a Physical Quantity
 The above method only applies to the specific instantiation of `Length` and is therefore temporary; it would be necessary to repeat this process every time you created a new `Length` object measurement and wanted to use cubits.
 
-A new unit of measure can be permanently added to a `PhysicalQuantity` class by essentially the same process, only it would be done inside the constructor of the quantity class.  For example:
+A new unit of measure can be permanently added to a class which implements the `PhysicalQuantityInterface` interface by essentially the same process, only it would be done inside the constructor of the quantity class.  For example:
 
 ``` php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;

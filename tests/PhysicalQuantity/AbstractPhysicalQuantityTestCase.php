@@ -9,7 +9,7 @@ abstract class AbstractPhysicalQuantityTestCase extends \PHPUnit_Framework_TestC
     /**
      * Build a test object of the target physical quantity.
      *
-     * @return PhysicalQuantity
+     * @return PhysicalQuantityInterface
      */
     abstract protected function instantiateTestQuantity();
 
