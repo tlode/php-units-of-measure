@@ -6,7 +6,7 @@ namespace PhpUnitsOfMeasure;
  * provides the infrastructure necessary for storing quantities and converting
  * between different units of measure.
  */
-abstract class PhysicalQuantity
+abstract class PhysicalQuantity implements PhysicalQuantityInterface
 {
     /**
      * The scalar value, in the original unit of measure.
@@ -38,8 +38,6 @@ abstract class PhysicalQuantity
      *
      * @throws \PhpUnitsOfMeasure\Exception\NonNumericValue If the value is not numeric
      * @throws \PhpUnitsOfMeasure\Exception\NonStringUnitName If the unit is not a string
-     *
-     * @return void
      */
     public function __construct($value, $unit)
     {
@@ -56,9 +54,7 @@ abstract class PhysicalQuantity
     }
 
     /**
-     * Display the value as a string, in the original unit of measure
-     *
-     * @return string The pretty-print version of the value, in the original unit of measure
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::__toString
      */
     public function __toString()
     {
@@ -69,14 +65,7 @@ abstract class PhysicalQuantity
     }
 
     /**
-     * Register a new Unit of Measure with this quantity.
-     *
-     * The intended use is to register a new unit of measure to which measurements
-     * of this physical quantity can be converted.
-     *
-     * @param \PhpUnitsOfMeasure\UnitOfMeasureInterface $unit The new unit of measure
-     *
-     * @return void
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::registerUnitOfMeasure
      */
     public function registerUnitOfMeasure(UnitOfMeasureInterface $unit)
     {
@@ -100,30 +89,7 @@ abstract class PhysicalQuantity
     }
 
     /**
-     * Fetch the measurement, in the given unit of measure
-     *
-     * @param  string $unit The desired unit of measure
-     *
-     * @return float        The measurement cast in the requested units
-     */
-    public function toUnit($unit)
-    {
-        $originalUnit    = $this->findUnitOfMeasureByNameOrAlias($this->originalUnit);
-        $nativeUnitValue = $originalUnit->convertValueToNativeUnitOfMeasure($this->originalValue);
-
-        $toUnit      = $this->findUnitOfMeasureByNameOrAlias($unit);
-        $toUnitValue = $toUnit->convertValueFromNativeUnitOfMeasure($nativeUnitValue);
-
-        return $toUnitValue;
-    }
-
-    /**
-     * Get the list of all supported unit names, with the option
-     * to include the units' aliases as well.
-     *
-     * @param boolean $withAliases Include all the unit alias names in the list
-     *
-     * @return array the collection of unit names
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::getSupportedUnits
      */
     public function getSupportedUnits($withAliases = false)
     {
@@ -141,17 +107,23 @@ abstract class PhysicalQuantity
     }
 
     /**
-     * Add a given quantity to this quantity, and return a new quantity object.
-     *
-     * Note that the new quantity's original unit will be the same as this object's.
-     *
-     * @param PhysicalQuantity $quantity The quantity to add to this one
-     *
-     * @throws \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch when there is a mismatch between physical quantities
-     *
-     * @return PhysicalQuantity the new quantity
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
      */
-    public function add(PhysicalQuantity $quantity)
+    public function toUnit($unit)
+    {
+        $originalUnit    = $this->findUnitOfMeasureByNameOrAlias($this->originalUnit);
+        $nativeUnitValue = $originalUnit->convertValueToNativeUnitOfMeasure($this->originalValue);
+
+        $toUnit      = $this->findUnitOfMeasureByNameOrAlias($unit);
+        $toUnitValue = $toUnit->convertValueFromNativeUnitOfMeasure($nativeUnitValue);
+
+        return $toUnitValue;
+    }
+
+    /**
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::add
+     */
+    public function add(PhysicalQuantityInterface $quantity)
     {
         if (get_class($quantity) !== get_class($this)) {
             throw new Exception\PhysicalQuantityMismatch('Cannot add type ('.get_class($quantity).') to type ('.get_class($this).').');
@@ -163,17 +135,9 @@ abstract class PhysicalQuantity
     }
 
     /**
-     * Subtract a given quantity from this quantity, and return a new quantity object.
-     *
-     * Note that the new quantity's original unit will be the same as this object's.
-     *
-     * @param PhysicalQuantity $quantity The quantity to subtract from this one
-     *
-     * @throws \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch when there is a mismatch between physical quantities
-     *
-     * @return PhysicalQuantity the new quantity
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::subtract
      */
-    public function subtract(PhysicalQuantity $quantity)
+    public function subtract(PhysicalQuantityInterface $quantity)
     {
         if (get_class($quantity) !== get_class($this)) {
             throw new Exception\PhysicalQuantityMismatch('Cannot subtract type ('.get_class($quantity).') from type ('.get_class($this).').');
