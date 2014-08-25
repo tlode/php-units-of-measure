@@ -6,7 +6,7 @@ namespace PhpUnitsOfMeasure;
  * provides the infrastructure necessary for storing quantities and converting
  * between different units of measure.
  */
-abstract class PhysicalQuantity implements PhysicalQuantityInterface
+abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements PhysicalQuantityInterface
 {
     /**
      * The collection of units of measure in which this quantity can
@@ -15,6 +15,14 @@ abstract class PhysicalQuantity implements PhysicalQuantityInterface
      * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface[]
      */
     static protected $unitDefinitions = [];
+
+    /**
+     * The unit of measure to be considered as the native
+     * unit of measure.
+     *
+     * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface
+     */
+    static protected $nativeUnitOfMeasure;
 
     /**
      * Have the default units been configured yet for this quantity?
@@ -56,6 +64,21 @@ abstract class PhysicalQuantity implements PhysicalQuantityInterface
 
         // Store the new unit in the list of units for this quantity
         static::$unitDefinitions[] = $unit;
+    }
+
+    /**
+     * [registerNativeUnitOfMeasure description]
+     * @param  UnitOfMeasureInterface $unit [description]
+     * @return [type]                       [description]
+     */
+    static protected function registerNativeUnitOfMeasure(UnitOfMeasureInterface $unit)
+    {
+        try {
+            static::registerUnitOfMeasure($unit);
+        } catch (Exception\DuplicateUnitNameOrAlias $e) {
+        }
+
+        static::$nativeUnitOfMeasure = $unit;
     }
 
     /**
@@ -153,6 +176,14 @@ abstract class PhysicalQuantity implements PhysicalQuantityInterface
     }
 
     /**
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::isSameQuantity
+     */
+    protected function isSameQuantity(PhysicalQuantityInterface $firstQuantity, PhysicalQuantityInterface $secondQuantity)
+    {
+        return get_class($firstQuantity) === get_class($secondQuantity);
+    }
+
+    /**
      * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
      */
     public function toUnit($unit)
@@ -167,6 +198,17 @@ abstract class PhysicalQuantity implements PhysicalQuantityInterface
     }
 
     /**
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
+     */
+    public function toNativeUnit()
+    {
+        $originalUnit    = static::findUnitOfMeasureByNameOrAlias($this->originalUnit);
+        $nativeUnitValue = $originalUnit->convertValueToNativeUnitOfMeasure($this->originalValue);
+
+        return $nativeUnitValue;
+    }
+
+    /**
      * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::__toString
      */
     public function __toString()
@@ -175,33 +217,5 @@ abstract class PhysicalQuantity implements PhysicalQuantityInterface
         $canonicalUnitName = $originalUnit->getName();
 
         return $this->originalValue . ' ' . $canonicalUnitName;
-    }
-
-    /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::add
-     */
-    public function add(PhysicalQuantityInterface $quantity)
-    {
-        if (get_class($quantity) !== get_class($this)) {
-            throw new Exception\PhysicalQuantityMismatch('Cannot add type ('.get_class($quantity).') to type ('.get_class($this).').');
-        }
-
-        $newValue = $this->originalValue + $quantity->toUnit($this->originalUnit);
-
-        return new static($newValue, $this->originalUnit);
-    }
-
-    /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::subtract
-     */
-    public function subtract(PhysicalQuantityInterface $quantity)
-    {
-        if (get_class($quantity) !== get_class($this)) {
-            throw new Exception\PhysicalQuantityMismatch('Cannot subtract type ('.get_class($quantity).') from type ('.get_class($this).').');
-        }
-
-        $newValue = $this->originalValue - $quantity->toUnit($this->originalUnit);
-
-        return new static($newValue, $this->originalUnit);
     }
 }

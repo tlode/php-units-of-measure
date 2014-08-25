@@ -2,21 +2,23 @@
 
 namespace PhpUnitsOfMeasureTest;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasureInterface;
 
-class Woogosity extends PhysicalQuantity
+class Woogosity extends BasePhysicalQuantity
 {
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
     }
 }
 
-class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
+class BasePhysicalQuantityTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @before
@@ -35,7 +37,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::registerUnitOfMeasure
      * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
      */
     public function testRegisterUnitFailsOnDuplicateName()
@@ -50,7 +52,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::registerUnitOfMeasure
      * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
      */
     public function testRegisterUnitFailsOnDuplicateAlias()
@@ -65,7 +67,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::getSupportedUnits
      */
     public function testGetSupportedUnits()
     {
@@ -83,7 +85,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::getSupportedUnits
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::getSupportedUnits
      */
     public function testGetSupportedUnitsWithAliases()
     {
@@ -104,7 +106,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::__construct
      */
     public function testInstantiateNewUnit()
     {
@@ -112,7 +114,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::__construct
      * @expectedException \PhpUnitsOfMeasure\Exception\NonNumericValue
      */
     public function testInstantiateNewUnitNonNumericValue()
@@ -121,7 +123,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::__construct
      * @expectedException \PhpUnitsOfMeasure\Exception\NonStringUnitName
      */
     public function testInstantiateNewUnitNonStringUnit()
@@ -130,7 +132,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::__toString
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::__toString
      */
     public function testToString()
     {
@@ -144,9 +146,9 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::registerUnitOfMeasure
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::toUnit
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::findUnitOfMeasureByNameOrAlias
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::registerUnitOfMeasure
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::toUnit
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::findUnitOfMeasureByNameOrAlias
      */
     public function testUnitConverts()
     {
@@ -174,7 +176,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::findUnitOfMeasureByNameOrAlias
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::findUnitOfMeasureByNameOrAlias
      * @expectedException \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure
      */
     public function testUnknownUnit()
@@ -189,7 +191,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::add
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::add
      */
     public function testAdd()
     {
@@ -201,7 +203,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::add
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::add
      *
      * @expectedException \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch
      */
@@ -214,7 +216,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::subtract
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::subtract
      */
     public function testSubtract()
     {
@@ -226,7 +228,7 @@ class PhysicalQuantityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\PhysicalQuantity::subtract
+     * @covers \PhpUnitsOfMeasure\BasePhysicalQuantity::subtract
      *
      * @expectedException \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch
      */

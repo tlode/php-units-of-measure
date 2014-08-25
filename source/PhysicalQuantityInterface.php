@@ -29,6 +29,13 @@ interface PhysicalQuantityInterface
     public function toUnit($unit);
 
     /**
+     * Fetch the measurement in the quantity's native unit of measure
+     *
+     * @return float the measurement cast to the native unit of measurement
+     */
+    public function toNativeUnit();
+
+    /**
      * Display the value as a string, in the original unit of measure
      *
      * @return string The pretty-print version of the value, in the original unit of measure
@@ -64,4 +71,28 @@ interface PhysicalQuantityInterface
      * @return PhysicalQuantityInterface the new quantity
      */
     public function subtract(PhysicalQuantityInterface $quantity);
+
+    /**
+     * Multiple a given quantity by this quantity, and return a new quantity object.
+     *
+     * The new quantity will be a derived quantity who's unit will be the
+     * multiplication of the original quantity's unit.
+     *
+     * @param PhysicalQuantityInterface $quantity The value by which to multiply this unit.
+     *
+     * @return DerivedPhysicalQuantity
+     */
+    public function multiplyBy(PhysicalQuantityInterface $quantity);
+
+    /**
+     * Divide this quantity by a given quantity, and return a new quantity object.
+     *
+     * The new quantity will be a compound quantity who's unit will be the
+     * this quantity's units divided by the given quantity's unit.
+     *
+     * @param PhysicalQuantityInterface $quantity The value by which to divide this unit.
+     *
+     * @return DerivedPhysicalQuantity
+     */
+    public function divideBy(PhysicalQuantityInterface $quantity);
 }

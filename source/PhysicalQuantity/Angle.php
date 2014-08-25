@@ -1,11 +1,11 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Angle extends PhysicalQuantity
+class Angle extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -13,13 +13,15 @@ class Angle extends PhysicalQuantity
 
     static protected $hasBeenInitialized = false;
 
+    static protected $nativeUnitOfMeasure;
+
     static protected function registerDefaultUnitsOfMeasure()
     {
         // Radians
         $radian = UnitOfMeasure::nativeUnitFactory('rad');
         $radian->addAlias('radian');
         $radian->addAlias('radians');
-        static::registerUnitOfMeasure($radian);
+        static::registerNativeUnitOfMeasure($radian);
 
         static::addMissingSIPrefixedUnits(
             $radian,

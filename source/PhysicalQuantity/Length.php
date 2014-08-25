@@ -1,17 +1,19 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Length extends PhysicalQuantity
+class Length extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
@@ -21,7 +23,7 @@ class Length extends PhysicalQuantity
         $meter->addAlias('meters');
         $meter->addAlias('metre');
         $meter->addAlias('metres');
-        static::registerUnitOfMeasure($meter);
+        static::registerNativeUnitOfMeasure($meter);
 
         static::addMissingSIPrefixedUnits(
             $meter,

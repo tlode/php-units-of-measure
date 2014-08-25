@@ -1,14 +1,16 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Area extends PhysicalQuantity
+class Area extends BasePhysicalQuantity
 {
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
@@ -19,7 +21,7 @@ class Area extends PhysicalQuantity
         $metersquared->addAlias('meters squared');
         $metersquared->addAlias('metre squared');
         $metersquared->addAlias('metres squared');
-        static::registerUnitOfMeasure($metersquared);
+        static::registerNativeUnitOfMeasure($metersquared);
 
         // Millimeter squared
         $newUnit = UnitOfMeasure::linearUnitFactory('mm^2', 1e-6);

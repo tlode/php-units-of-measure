@@ -1,3 +1,10 @@
+## v2.0.0 ()
+- The collection of units of measure that a given quantity supports is now a static property of physical quantity classes, as opposed to a property of each individual value object.  This means that adding units of measure to Length, say, will make those units available to all length instances.  This has the effect of greatly reducing object count in situations where large numbers of value objects are instantiated.
+  - As part of this change, default units of measure are no longer added in the quantity class constructor, and are instead handled in a registerDefaultUnitsOfMeasure() static method.
+  - registerUnitOfMeasure() and getSupportedUnits() are now static methods.
+- Physical quantities now have an abstract interface to implement - PhysicalQuantityInterface
+
+
 ## v1.3.1 (August 23rd, 2014)
 - Added information in the README about the new SI prefix units generation
 

@@ -1,11 +1,11 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Temperature extends PhysicalQuantity
+class Temperature extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -13,13 +13,15 @@ class Temperature extends PhysicalQuantity
 
     static protected $hasBeenInitialized = false;
 
+    static protected $nativeUnitOfMeasure;
+
     static protected function registerDefaultUnitsOfMeasure()
     {
         // Kelvin
         $kelvin = UnitOfMeasure::nativeUnitFactory('K');
         $kelvin->addAlias('°K');
         $kelvin->addAlias('kelvin');
-        static::registerUnitOfMeasure($kelvin);
+        static::registerNativeUnitOfMeasure($kelvin);
 
         static::addMissingSIPrefixedUnits(
             $kelvin,

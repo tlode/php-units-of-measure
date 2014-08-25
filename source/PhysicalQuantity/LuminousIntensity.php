@@ -1,11 +1,11 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class LuminousIntensity extends PhysicalQuantity
+class LuminousIntensity extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -13,12 +13,14 @@ class LuminousIntensity extends PhysicalQuantity
 
     static protected $hasBeenInitialized = false;
 
+    static protected $nativeUnitOfMeasure;
+
     static protected function registerDefaultUnitsOfMeasure()
     {
         // Candela
         $candela = UnitOfMeasure::nativeUnitFactory('cd');
         $candela->addAlias('candela');
-        static::registerUnitOfMeasure($candela);
+        static::registerNativeUnitOfMeasure($candela);
 
         static::addMissingSIPrefixedUnits(
             $candela,

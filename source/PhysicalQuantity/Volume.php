@@ -1,14 +1,16 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Volume extends PhysicalQuantity
+class Volume extends BasePhysicalQuantity
 {
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
@@ -19,7 +21,7 @@ class Volume extends PhysicalQuantity
         $cubicmeter->addAlias('cubic meters');
         $cubicmeter->addAlias('cubic metre');
         $cubicmeter->addAlias('cubic metres');
-        static::registerUnitOfMeasure($cubicmeter);
+        static::registerNativeUnitOfMeasure($cubicmeter);
 
         // Cubic millimeter
         $newUnit = UnitOfMeasure::linearUnitFactory('mm^3', 1e-9);

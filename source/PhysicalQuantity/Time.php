@@ -1,17 +1,19 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Time extends PhysicalQuantity
+class Time extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
@@ -21,7 +23,7 @@ class Time extends PhysicalQuantity
         $second->addAlias('secs');
         $second->addAlias('second');
         $second->addAlias('seconds');
-        static::registerUnitOfMeasure($second);
+        static::registerNativeUnitOfMeasure($second);
 
         static::addMissingSIPrefixedUnits(
             $second,

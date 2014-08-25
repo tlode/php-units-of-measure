@@ -1,11 +1,11 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Pressure extends PhysicalQuantity
+class Pressure extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -13,12 +13,14 @@ class Pressure extends PhysicalQuantity
 
     static protected $hasBeenInitialized = false;
 
+    static protected $nativeUnitOfMeasure;
+
     static protected function registerDefaultUnitsOfMeasure()
     {
         // Pascal
         $pascal = UnitOfMeasure::nativeUnitFactory('Pa');
         $pascal->addAlias('pascal');
-        static::registerUnitOfMeasure($pascal);
+        static::registerNativeUnitOfMeasure($pascal);
 
         static::addMissingSIPrefixedUnits(
             $pascal,

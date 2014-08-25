@@ -1,14 +1,16 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\BasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Velocity extends PhysicalQuantity
+class Velocity extends BasePhysicalQuantity
 {
     static protected $unitDefinitions = [];
 
     static protected $hasBeenInitialized = false;
+
+    static protected $nativeUnitOfMeasure;
 
     static protected function registerDefaultUnitsOfMeasure()
     {
@@ -18,6 +20,6 @@ class Velocity extends PhysicalQuantity
         $meterpersecond->addAlias('meter per second');
         $meterpersecond->addAlias('metres per second');
         $meterpersecond->addAlias('metre per second');
-        static::registerUnitOfMeasure($meterpersecond);
+        static::registerNativeUnitOfMeasure($meterpersecond);
     }
 }

@@ -33,15 +33,13 @@ interface UnitOfMeasureInterface
      * @param string $alias The new alias
      *
      * @throws \PhpUnitsOfMeasure\Exception\NonStringUnitName If The alias name is not a string.
-     *
-     * @return void
      */
     public function addAlias($alias);
 
     /**
      * Get the list of alternate names for this unit
      *
-     * @return array The collection of aliases
+     * @return string[] The collection of aliases
      */
     public function getAliases();
 

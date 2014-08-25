@@ -148,11 +148,11 @@ For units that use the metric system, there's a convenience trait available for 
 ``` php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Mass extends PhysicalQuantity
+class Mass extends BasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -192,10 +192,10 @@ A new unit of measure can be permanently added to a class which implements the `
 ``` php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\PhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Length extends PhysicalQuantity
+class Length extends BasePhysicalQuantity
 {
     public function __construct($value, $unit)
     {
