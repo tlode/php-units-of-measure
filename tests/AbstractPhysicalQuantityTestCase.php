@@ -4,15 +4,40 @@ namespace PhpUnitsOfMeasureTest;
 
 use PHPUnit_Framework_TestCase;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
-use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
 
 abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCase
 {
     protected $firstTestClass;
+
     protected $secondTestClass;
 
     abstract protected function getTestUnitOfMeasure($name, $aliases = []);
+
+    public function resetStaticProperty()
+    {
+        $fieldInitValues = [
+            'unitDefinitions'     => [],
+            'hasBeenInitialized'  => false,
+            'nativeUnitOfMeasure' => null,
+        ];
+
+        $classNames = [
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness'
+        ];
+
+        foreach ($classNames as $className) {
+            foreach ($fieldInitValues as $fieldName => $fieldValue) {
+                $property = (new \ReflectionClass($className))
+                    ->getProperty($fieldName);
+                $property->setAccessible(true);
+                $property->setValue($fieldValue);
+                $property->setAccessible(false);
+            }
+        }
+    }
 
     /**
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
@@ -198,7 +223,7 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
 
         $sum = $first->add($second);
 
-        $this->assertInstanceOf('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity', $sum);
+        $this->assertInstanceOf($firstTestClass, $sum);
         $this->assertSame('10.862236628849 p', (string) $sum);
     }
 
@@ -230,7 +255,7 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
 
         $difference = $first->subtract($second);
 
-        $this->assertInstanceOf('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity', $difference);
+        $this->assertInstanceOf($firstTestClass, $difference);
         $this->assertSame('1.1377633711507 p', (string) $difference);
     }
 

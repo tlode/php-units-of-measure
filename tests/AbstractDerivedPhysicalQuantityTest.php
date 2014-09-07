@@ -32,35 +32,8 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      */
     public function resetStaticProperty()
     {
-        $fieldInitValues = [
-            'unitDefinitions'     => [],
-            'hasBeenInitialized'  => false,
-            'nativeUnitOfMeasure' => null,
-        ];
-
-        foreach ($fieldInitValues as $fieldName => $fieldValue) {
-            $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity'))
-                ->getProperty($fieldName);
-            $property->setAccessible(true);
-            $property->setValue($fieldValue);
-            $property->setAccessible(false);
-        }
-
-        $fieldInitValues = [
-            'unitDefinitions'     => [],
-            'hasBeenInitialized'  => false,
-            'nativeUnitOfMeasure' => null,
-        ];
-
-        foreach ($fieldInitValues as $fieldName => $fieldValue) {
-            $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness'))
-                ->getProperty($fieldName);
-            $property->setAccessible(true);
-            $property->setValue($fieldValue);
-            $property->setAccessible(false);
-        }
+        parent::resetStaticProperty();
     }
-
 
     /**
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
