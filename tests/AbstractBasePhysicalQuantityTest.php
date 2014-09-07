@@ -8,6 +8,22 @@ use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
 
 class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
 {
+    protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity';
+    protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity';
+
+    protected function getTestUnitOfMeasure($name, $aliases = [])
+    {
+        $newUnit = $this->getMock('\PhpUnitsOfMeasure\UnitOfMeasureInterface');
+        $newUnit->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+                $newUnit->expects($this->any())
+            ->method('getAliases')
+            ->will($this->returnValue($aliases));
+
+        return $newUnit;
+    }
+
     /**
      * @before
      */

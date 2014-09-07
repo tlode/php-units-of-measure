@@ -11,7 +11,23 @@ use PhpUnitsOfMeasure\PhysicalQuantity\DimensionlessCoefficient;
 
 class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
 {
-     /**
+    protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity';
+    protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity';
+
+    protected function getTestUnitOfMeasure($name, $aliases = [])
+    {
+        $newUnit = $this->getMock('\PhpUnitsOfMeasure\UnitOfMeasureInterface');
+        $newUnit->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+                $newUnit->expects($this->any())
+            ->method('getAliases')
+            ->will($this->returnValue($aliases));
+
+        return $newUnit;
+    }
+
+    /**
      * @before
      */
     public function resetStaticProperty()
@@ -81,8 +97,6 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * and also that denominator and numerator factors can be cancelled properly.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::recursiveDecomposeFactors
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::reduceFactors
      */
     public function testFactorCompositionFromComposite()
     {
@@ -119,6 +133,8 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
 
     /**
      * The combination of factors do not match the only known derived quantity (Pumpalumpiness).
+     *
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testUnknownUnitClass()
     {
@@ -135,7 +151,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * counts are similar.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testUnknownUnitClassWithSameUnitCount()
     {
@@ -154,7 +170,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * counts are similar.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testUnknownUnitClassWithSameUnitCountDenominatorVariant()
     {
@@ -169,8 +185,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     }
 
     /**
+     *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testKnownUnitClass()
     {
@@ -188,7 +205,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * The combination of factors are equivalent to the above set, but are in a different order.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testKnownUnitClassDifferentOrder()
     {
@@ -206,7 +223,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * Dimensionless coeficients should be ignored when determining unit matches.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testKnownUnitClassWithCoefficientInNumerator()
     {
@@ -224,7 +241,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
      * Dimensionless coeficients should be ignored when determining unit matches.
      *
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::matchesFactors
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
     public function testKnownUnitClassWithCoefficientInDenominator()
     {
@@ -261,5 +278,21 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
             ],
             $quantities[1]
         );
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getComponentFactors
+     */
+    public function testGetComponentFactors()
+    {
+        $quantityA = AbstractDerivedPhysicalQuantity::factory(
+            [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
+            [new Wonkicity(2, 'u'), new Wonkicity(4, 'u'), new DimensionlessCoefficient(2)]
+        );
+        $factors = $quantityA->getComponentFactors();
+
+        // Kind of a weak test, but at least we can verify the counts are right
+        $this->assertEquals(4, count($factors[0]));
+        $this->assertEquals(2, count($factors[1]));
     }
 }
