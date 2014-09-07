@@ -156,9 +156,6 @@ trait HasSIUnitsTrait
         // Determine the conversion factor from the no-prefix SI unit to the physical quantity's native unit
         $noPrefixToNativeUnitFactor = $siUnit->convertValueToNativeUnitOfMeasure(1) * $toBaseSiUnitFactor;
 
-        // Identify the current set of unit names, so we can avoid duplicates
-        $existingUnitNames = static::getSupportedUnitNames($withAliases = true);
-
         // For each of the standard SI prefixes, attempt to register a new unit of measure
         foreach ($siPrefixes as $prefixDefinition) {
 
@@ -173,11 +170,8 @@ trait HasSIUnitsTrait
                 );
             };
 
-            // Generate the base name of the new unit, and if it's already present skip this unit
+            // Generate the base name of the new unit
             $name = $parsePattern($namePattern);
-            if (in_array($name, $existingUnitNames)) {
-                continue;
-            }
 
             // Determine the factor that converts the new unit into the physical quantity's
             //   native unit of measure.
@@ -186,17 +180,16 @@ trait HasSIUnitsTrait
             // Instantiate the new unit of measure
             $newUnit = UnitOfMeasure::linearUnitFactory($name, $toNativeUnitFactor);
 
-            // Generate the aliases of the new unit, and if any are already present, skip this unit
+            // Generate the aliases of the new unit
             foreach ($aliasPatterns as $aliasPattern) {
                 $newUnitAlias = $parsePattern($aliasPattern);
-                if (in_array($newUnitAlias, $existingUnitNames)) {
-                    continue 2;
-                }
                 $newUnit->addAlias($newUnitAlias);
             }
 
-            // Add the new unit of measure to this physical quantity
-            static::registerUnitOfMeasure($newUnit);
+            // If the unit doesn't conflict with any of the already-existing units, register it
+            if (!static::unitNameOrAliasesAlreadyExist($newUnit)) {
+                static::registerUnitOfMeasure($newUnit);
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      * @var string[]
      */
     private static $derivedQuantityClasses = [
+        // TODO fill this with derived quantity classes
     ];
 
     /**
@@ -196,17 +197,6 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
     protected static $componentQuantities = [];
 
     /**
-     * Fetch the set of component quantities that make up the
-     * numerator and denominator of this derived quantity.
-     *
-     * @return array[]
-     */
-    public static function getDefinitionComponentQuantites()
-    {
-        return static::$componentQuantities;
-    }
-
-    /**
      * Does this class match the given numerator and denominator sets?
      *
      * The order of units doesn't matter, and DimensionlessCoefficients are ignored.
@@ -216,7 +206,7 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      *
      * @return boolean True if its a match, false if not.
      */
-    protected static function matchesFactors(array $numerators, array $denominators)
+    private static function matchesFactors(array $numerators, array $denominators)
     {
         // Ignore the dimensionless coefficients
         $removeCoefficent = function ($element) {
@@ -225,18 +215,21 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
         $numerators   = array_filter($numerators, $removeCoefficent);
         $denominators = array_filter($denominators, $removeCoefficent);
 
-        // Get the set of numerator and denominator quantity classes
+        // Get the set of numerator and denominator quantity classes for this instance
         $numeratorClasses   = array_map('get_class', $numerators);
         $denominatorClasses = array_map('get_class', $denominators);
 
-        $componentQuantities = static::getDefinitionComponentQuantites();
+        // Get the set of component quantities that make up this derived quantity
+        $componentQuantities = static::$componentQuantities;
+
+        // If the array sets aren't equivalent, then this is not a match
         sort($numeratorClasses);
         sort($denominatorClasses);
         sort($componentQuantities[0]);
         sort($componentQuantities[1]);
-
-        // If the array sets aren't equivalent, then this is not a match
-        return ($numeratorClasses === $componentQuantities[0] && $denominatorClasses === $componentQuantities[1]);
+        return ($numeratorClasses === $componentQuantities[0]
+            && $denominatorClasses === $componentQuantities[1]
+        );
     }
 
 
@@ -245,18 +238,11 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
     // ***********************************
 
     /**
-     * The physical quantities which make up the numerator of this quantity.
+     * A tuple of arrays naming up the numerators and denominator quantities for this quantity.
      *
-     * @var PhysicalQuantityInterface[]
+     * @var array[]
      */
-    protected $numerators = [];
-
-    /**
-     * The physical quantities which make up the denominator of this quantity.
-     *
-     * PhysicalQuantityInterface[]
-     */
-    protected $denominators = [];
+    protected $componentFactors = [];
 
     /**
      * This constructor is protected, to force the usage of the static factory() method above.
@@ -266,8 +252,7 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      */
     protected function __construct(array $numerators, array $denominators)
     {
-        $this->numerators   = array_values($numerators);
-        $this->denominators = array_values($denominators);
+        $this->componentFactors = [array_values($numerators), array_values($denominators)];
     }
 
     /**
@@ -276,9 +261,9 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      *
      * @return @return array[] A tuple of the form (AbstractBasePhysicalQuantity[], AbstractBasePhysicalQuantity[]) representing numerators and denominators
      */
-    public function getComponentFactors()
+    private function getComponentFactors()
     {
-        return [$this->numerators, $this->denominators];
+        return $this->componentFactors;
     }
 
     /**
@@ -305,6 +290,8 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
     protected function getOriginalUnit()
     {
         // TODO not yet implemented
+        // Something like creating a new unit of measure to represent the specific
+        // units on the fly?
     }
 
     /**

@@ -57,39 +57,6 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
     }
 
     /**
-     * @dataProvider validUnitsProvider
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getSupportedUnitNames
-     */
-    public function testgetSupportedUnitNames(
-        $withAliases,
-        array $newUnits,
-        $resultingNames
-    ) {
-        $firstTestClass = $this->firstTestClass;
-        foreach ($newUnits as $newUnit) {
-           $firstTestClass::registerUnitOfMeasure($newUnit);
-        }
-
-        $this->assertArraySameValues(
-            $resultingNames,
-            $firstTestClass::getSupportedUnitNames($withAliases)
-        );
-    }
-
-    /**
-     * @dataProvider quantityConversionsProvider
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
-     */
-    public function testUnitConvertsToNativeUnit(
-        AbstractPhysicalQuantity $value,
-        $valueInNativeUnit,
-        $arbitraryUnit,
-        $valueInArbitraryUnit
-    ) {
-        $this->assertSame($valueInNativeUnit, $value->toNativeUnit());
-    }
-
-    /**
      * @dataProvider quantityConversionsProvider
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
      */
@@ -173,41 +140,41 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
      * @dataProvider productProvider
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
      */
-    public function testMultiplyBy(
-        AbstractPhysicalQuantity $firstValue,
-        AbstractPhysicalQuantity $secondValue,
-        $productString,
-        $productType,
-        $quotientString,
-        $quotientType
-    ) {
-        $product = $firstValue->multiplyBy($secondValue);
+    // public function testMultiplyBy(
+    //     AbstractPhysicalQuantity $firstValue,
+    //     AbstractPhysicalQuantity $secondValue,
+    //     $productString,
+    //     $productType,
+    //     $quotientString,
+    //     $quotientType
+    // ) {
+    //     $product = $firstValue->multiplyBy($secondValue);
 
-        $this->assertInstanceOf($productType, $product);
-        $this->assertSame($productString, (string) $product);
-    }
+    //     $this->assertInstanceOf($productType, $product);
+    //     $this->assertSame($productString, (string) $product);
+    // }
 
-    /**
-     * @dataProvider productProvider
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
-     */
-    public function testDivideBy(
-        AbstractPhysicalQuantity $firstValue,
-        AbstractPhysicalQuantity $secondValue,
-        $productString,
-        $productType,
-        $quotientString,
-        $quotientType
-    ) {
-        $quotient = $firstValue->divideBy($secondValue);
+    // *
+    //  * @dataProvider productProvider
+    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
 
-        $this->assertInstanceOf($quotientType, $quotient);
-        $this->assertSame($quotientString, (string) $quotient);
-    }
+    // public function testDivideBy(
+    //     AbstractPhysicalQuantity $firstValue,
+    //     AbstractPhysicalQuantity $secondValue,
+    //     $productString,
+    //     $productType,
+    //     $quotientString,
+    //     $quotientType
+    // ) {
+    //     $quotient = $firstValue->divideBy($secondValue);
+
+    //     $this->assertInstanceOf($quotientType, $quotient);
+    //     $this->assertSame($quotientString, (string) $quotient);
+    // }
 
     abstract public function exceptionProducingUnitsProvider();
 
-    abstract public function validUnitsProvider();
+    // abstract public function validUnitsProvider();
 
     abstract public function quantityConversionsProvider();
 

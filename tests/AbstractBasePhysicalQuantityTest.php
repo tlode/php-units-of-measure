@@ -41,27 +41,27 @@ class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
         ];
     }
 
-    public function validUnitsProvider()
-    {
-        return [
-            [
-                $withAliases = false,
-                [
-                    $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-                    $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-                ],
-                ['l', 'p', 'quatloos', 'schmoos'],
-            ],
-            [
-                $withAliases = true,
-                [
-                    $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-                    $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-                ],
-                ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-            ]
-        ];
-    }
+    // public function validUnitsProvider()
+    // {
+    //     return [
+    //         [
+    //             $withAliases = false,
+    //             [
+    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
+    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
+    //             ],
+    //             ['l', 'p', 'quatloos', 'schmoos'],
+    //         ],
+    //         [
+    //             $withAliases = true,
+    //             [
+    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
+    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
+    //             ],
+    //             ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
+    //         ]
+    //     ];
+    // }
 
     public function quantityConversionsProvider()
     {
