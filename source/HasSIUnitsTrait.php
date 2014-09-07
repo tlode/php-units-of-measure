@@ -157,7 +157,7 @@ trait HasSIUnitsTrait
         $noPrefixToNativeUnitFactor = $siUnit->convertValueToNativeUnitOfMeasure(1) * $toBaseSiUnitFactor;
 
         // Identify the current set of unit names, so we can avoid duplicates
-        $existingUnitNames = static::getSupportedUnits($withAliases = true);
+        $existingUnitNames = static::getSupportedUnitNames($withAliases = true);
 
         // For each of the standard SI prefixes, attempt to register a new unit of measure
         foreach ($siPrefixes as $prefixDefinition) {

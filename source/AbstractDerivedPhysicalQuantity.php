@@ -292,8 +292,8 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
         foreach ($numerators as $numerator) {
             $value *= $numerator->getOriginalValue();
         }
-        foreach ($numerators as $numerator) {
-            $value /= $numerator->getOriginalValue();
+        foreach ($denominators as $denominator) {
+            $value /= $denominator->getOriginalValue();
         }
 
         return $value;

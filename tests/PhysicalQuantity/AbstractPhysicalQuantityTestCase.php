@@ -15,7 +15,7 @@ abstract class AbstractPhysicalQuantityTestCase extends \PHPUnit_Framework_TestC
 
         $this->assertEquals(
             $this->supportedUnitsWithAliases,
-            $quantityClass::getSupportedUnits($withAliases = true)
+            $quantityClass::getSupportedUnitNames($withAliases = true)
         );
     }
 

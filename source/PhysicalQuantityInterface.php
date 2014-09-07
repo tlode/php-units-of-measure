@@ -16,7 +16,7 @@ interface PhysicalQuantityInterface
     /**
      * Fetch the measurement, in the given unit of measure
      *
-     * @param  string $unit The desired unit of measure
+     * @param  UnitOfMeasureInterface|string $unit The desired unit of measure, or a string name of one
      *
      * @return float The measurement cast in the requested units
      */

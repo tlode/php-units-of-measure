@@ -5,6 +5,7 @@ namespace PhpUnitsOfMeasureTest;
 use PHPUnit_Framework_TestCase;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 
 abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCase
 {
@@ -14,18 +15,23 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
 
     abstract protected function getTestUnitOfMeasure($name, $aliases = []);
 
+    /**
+     * Running this before every test will clear out the static initalization
+     * of an AbstractPhysicalQuantity class.
+     */
     public function resetStaticProperty()
     {
         $fieldInitValues = [
-            'unitDefinitions'     => [],
-            'hasBeenInitialized'  => false,
+            'unitDefinitions'    => [],
+            'hasBeenInitialized' => false,
         ];
 
         $classNames = [
-            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity',
-            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity',
-            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness',
             '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Plooposity',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity',
+            '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity',
         ];
 
         foreach ($classNames as $className) {
@@ -40,272 +46,176 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
     }
 
     /**
+     * @dataProvider exceptionProducingUnitsProvider
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
      * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
      */
-    public function testRegisterUnitFailsOnNewUnitNameIsDuplicateExistingName()
+    public function testRegisterUnitFailsOnNameCollision($newUnit)
     {
         $firstTestClass = $this->firstTestClass;
-        $newUnit = $this->getTestUnitOfMeasure('p', []);
         $firstTestClass::registerUnitOfMeasure($newUnit);
     }
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
-    //  */
-    // public function testRegisterUnitFailsOnNewAliasNameIsDuplicateExistingName()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $newUnit = $this->getTestUnitOfMeasure('palimpwid', ['p']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-    // }
+    /**
+     * @dataProvider validUnitsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getSupportedUnitNames
+     */
+    public function testgetSupportedUnitNames(
+        $withAliases,
+        array $newUnits,
+        $resultingNames
+    ) {
+        $firstTestClass = $this->firstTestClass;
+        foreach ($newUnits as $newUnit) {
+           $firstTestClass::registerUnitOfMeasure($newUnit);
+        }
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
-    //  */
-    // public function testRegisterUnitFailsOnNewUnitNameIsDuplicateExistingAlias()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $newUnit = $this->getTestUnitOfMeasure('plurp', []);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-    // }
+        $this->assertArraySameValues(
+            $resultingNames,
+            $firstTestClass::getSupportedUnitNames($withAliases)
+        );
+    }
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
-    //  */
-    // public function testRegisterUnitFailsOnNewAliasNameIsDuplicateExistingAlias()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $newUnit = $this->getTestUnitOfMeasure('palimpwid', ['plurp']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-    // }
+    /**
+     * @dataProvider quantityConversionsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
+     */
+    public function testUnitConvertsToNativeUnit(
+        AbstractPhysicalQuantity $value,
+        $valueInNativeUnit,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $this->assertSame($valueInNativeUnit, $value->toNativeUnit());
+    }
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::registerUnitOfMeasure
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getSupportedUnits
-    //  */
-    // public function testGetSupportedUnits()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
+    /**
+     * @dataProvider quantityConversionsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
+     */
+    public function testUnitConvertsToArbitraryUnit(
+        AbstractPhysicalQuantity $value,
+        $valueInNativeUnit,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $this->assertSame($valueInArbitraryUnit, $value->toUnit($arbitraryUnit));
+    }
 
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+    /**
+     * @dataProvider quantityConversionsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
+     * @expectedException \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure
+     */
+    public function testConvertToUnknownUnitThrowsException(
+        AbstractPhysicalQuantity $value,
+        $valueInNativeUnit,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $value->toUnit('someUnknownUnit');
+    }
 
-    //     // Schmoos
-    //     $newUnit = $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+    /**
+     * @dataProvider toStringProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__toString
+     */
+    public function testToString(AbstractPhysicalQuantity $value, $string)
+    {
+        $this->assertSame($string, (string) $value);
+    }
 
-    //     $this->assertArraySameValues(
-    //         ['l', 'p', 'quatloos', 'schmoos'],
-    //         $firstTestClass::getSupportedUnits()
-    //     );
-    // }
+    /**
+     * @dataProvider arithmeticProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
+     */
+    public function testAdd(
+        $shouldThrowException,
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $sumString,
+        $diffString
+    ) {
+        if ($shouldThrowException) {
+            $this->setExpectedException('\PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
+        }
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getSupportedUnits
-    //  */
-    // public function testGetSupportedUnitsWithAliases()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
+        $sum = $firstValue->add($secondValue);
 
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+        if (!$shouldThrowException) {
+            $this->assertSame($sumString, (string) $sum);
+        }
+    }
 
-    //     // Schmoos
-    //     $newUnit = $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm']);
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+    /**
+     * @dataProvider arithmeticProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
+     */
+    public function testSubtract(
+        $shouldThrowException,
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $sumString,
+        $diffString
+    ) {
+        if ($shouldThrowException) {
+            $this->setExpectedException('\PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
+        }
 
-    //     $this->assertArraySameValues(
-    //         ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-    //         $firstTestClass::getSupportedUnits(true)
-    //     );
-    // }
+        $difference = $firstValue->subtract($secondValue);
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
-    //  */
-    // public function testUnitConvertsToNativeUnit()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
+        if (!$shouldThrowException) {
+            $this->assertSame($diffString, (string) $difference);
+        }
+    }
 
-    //     $value = new $firstTestClass(1.234, 'quatloos');
+    /**
+     * @dataProvider productProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
+     */
+    public function testMultiplyBy(
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $productString,
+        $productType,
+        $quotientString,
+        $quotientType
+    ) {
+        $product = $firstValue->multiplyBy($secondValue);
 
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos');
-    //     $newUnit->expects($this->any())
-    //         ->method('convertValueToNativeUnitOfMeasure')
-    //         ->will($this->returnValue(1.234));
+        $this->assertInstanceOf($productType, $product);
+        $this->assertSame($productString, (string) $product);
+    }
 
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+    /**
+     * @dataProvider productProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
+     */
+    public function testDivideBy(
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $productString,
+        $productType,
+        $quotientString,
+        $quotientType
+    ) {
+        $quotient = $firstValue->divideBy($secondValue);
 
-    //     $valueInGalimpwids = $value->toNativeUnit();
+        $this->assertInstanceOf($quotientType, $quotient);
+        $this->assertSame($quotientString, (string) $quotient);
+    }
 
-    //     $this->assertSame(1.234, $valueInGalimpwids);
-    // }
+    abstract public function exceptionProducingUnitsProvider();
 
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
-    //  */
-    // public function testUnitConvertsToArbitraryUnit()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
+    abstract public function validUnitsProvider();
 
-    //     $value = new $firstTestClass(1.234, 'quatloos');
+    abstract public function quantityConversionsProvider();
 
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos');
-    //     $newUnit->expects($this->any())
-    //         ->method('convertValueToNativeUnitOfMeasure')
-    //         ->will($this->returnValue(1.234));
+    abstract public function toStringProvider();
 
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
+    abstract public function arithmeticProvider();
 
-    //     // Galactic Imperial Widgets (let's say it's defined as 2 quatloos)
-    //     $newUnit = $this->getTestUnitOfMeasure('galimpwid');
-    //     $newUnit->expects($this->any())
-    //         ->method('convertValueFromNativeUnitOfMeasure')
-    //         ->will($this->returnValue(2.468));
-
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-
-    //     $valueInGalimpwids = $value->toUnit('galimpwid');
-
-    //     $this->assertSame(2.468, $valueInGalimpwids);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure
-    //  */
-    // public function testToUnknownUnit()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-
-    //     $value = new $firstTestClass(1.234, 'quatloos');
-
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos');
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-
-    //     $valueInGalimpwids = $value->toUnit('galimpwid');
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__toString
-    //  */
-    // public function testToString()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-
-    //     $value = new $firstTestClass(1.234, 'quatloos');
-
-    //     // Quatloos
-    //     $newUnit = $this->getTestUnitOfMeasure('quatloos');
-    //     $firstTestClass::registerUnitOfMeasure($newUnit);
-
-    //     $this->assertSame('1.234 quatloos', (string) $value);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
-    //  */
-    // public function testAdd()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $firstTestClass(6, 'lupees');
-
-    //     $sum = $first->add($second);
-
-    //     $this->assertInstanceOf($firstTestClass, $sum);
-    //     $this->assertSame('10.862236628849 p', (string) $sum);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
-    //  *
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch
-    //  */
-    // public function testAddThrowsExceptionOnQuantityMismatch()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $secondTestClass = $this->secondTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $secondTestClass(6, 'lupees');
-
-    //     $sum = $first->add($second);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::subtract
-    //  */
-    // public function testSubtract()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $firstTestClass(6, 'lupees');
-
-    //     $difference = $first->subtract($second);
-
-    //     $this->assertInstanceOf($firstTestClass, $difference);
-    //     $this->assertSame('1.1377633711507 p', (string) $difference);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::subtract
-    //  *
-    //  * @expectedException \PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch
-    //  */
-    // public function testSubtractThrowsExceptionOnQuantityMismatch()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $secondTestClass = $this->secondTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $secondTestClass(6, 'lupees');
-
-    //     $sum = $first->subtract($second);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
-    //  */
-    // public function testMultiplyBy()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $secondTestClass = $this->secondTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $secondTestClass(6, 'lupees');
-
-    //     $product = $first->multiplyBy($second);
-
-    //     $this->assertInstanceOf('\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity', $product);
-    // }
-
-    // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
-    //  */
-    // public function testDivideBy()
-    // {
-    //     $firstTestClass = $this->firstTestClass;
-    //     $secondTestClass = $this->secondTestClass;
-
-    //     $first  = new $firstTestClass(6, 'plurps');
-    //     $second = new $secondTestClass(6, 'lupees');
-
-    //     $quotient = $first->divideBy($second);
-
-    //     $this->assertInstanceOf('\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity', $quotient);
-    // }
+    abstract public function productProvider();
 
     /**
      * Assert that two arrays have the same values, regardless of the order.

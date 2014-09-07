@@ -14,6 +14,14 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness';
     protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Plooposity';
 
+    /**
+     * @before
+     */
+    public function resetStaticProperty()
+    {
+        parent::resetStaticProperty();
+    }
+
     protected function getTestUnitOfMeasure($name, $aliases = [])
     {
         $newUnit = $this->getMock('\PhpUnitsOfMeasure\UnitOfMeasureInterface');
@@ -27,13 +35,84 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
         return $newUnit;
     }
 
-    /**
-     * @before
-     */
-    public function resetStaticProperty()
+    public function exceptionProducingUnitsProvider()
     {
-        parent::resetStaticProperty();
+        return [
+            [$this->getTestUnitOfMeasure('fl', [])],                 // name/name collision
+            [$this->getTestUnitOfMeasure('noconflict', ['fl'])],     // alias/name collision
+            [$this->getTestUnitOfMeasure('glergs', [])],             // name/alias collision
+            [$this->getTestUnitOfMeasure('noconflict', ['glergs'])], // alias/alias collision
+        ];
     }
+
+    public function validUnitsProvider()
+    {
+        return [
+            [
+                $withAliases = false,
+                [
+                    $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
+                    $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
+                ],
+                ['fl', 'gl', 'quatloos', 'schmoos'],
+            ],
+            [
+                $withAliases = true,
+                [
+                    $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
+                    $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
+                ],
+                ['fl', 'floop', 'floops', 'gl', 'glerg', 'glergs', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
+            ]
+        ];
+    }
+
+    // @TODO these providers need to be swapped over to a derivedclass test
+    public function quantityConversionsProvider()
+    {
+        return [
+            [new Woogosity(2, 'l'), 2, 'l', 2],
+            [new Woogosity(2, 'l'), 2, 'plurp', 2/1.234],
+            [new Woogosity(2, 'plurp'), 2*1.234, 'l', 2*1.234],
+            [new Woogosity(2, 'plurp'), 2*1.234, 'plurp', 2.0]
+        ];
+    }
+
+    public function toStringProvider()
+    {
+        return [
+            [new Woogosity(2, 'l'), '2 l'],
+            [new Woogosity(2, 'lupee'), '2 l'],
+            [new Woogosity(2, 'p'), '2 p'],
+            [new Woogosity(2, 'plurp'), '2 p'],
+        ];
+    }
+
+    public function arithmeticProvider()
+    {
+        return [
+            [false, new Woogosity(2, 'l'), new Woogosity(2.5, 'l'), '4.5 l', '-0.5 l'],
+            [true,  new Woogosity(2, 'l'), new Wonkicity(2, 'u'), '', ''],
+        ];
+    }
+
+    public function productProvider()
+    {
+        return [
+            [
+                new Woogosity(2, 'l'),
+                new Woogosity(4, 'l'),
+                '8 l^2',
+                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity',
+                '0.5',
+                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity'
+            ],
+        ];
+    }
+
+    // ************************************************************************
+    // *** Here ends the shared tests from AbstractPhysicalQuantityTestCase ***
+    // ************************************************************************
 
     /**
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory

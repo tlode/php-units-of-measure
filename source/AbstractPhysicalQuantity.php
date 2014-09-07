@@ -12,12 +12,6 @@ abstract class AbstractPhysicalQuantity
     protected static $unitDefinitions = [];
 
     /**
-     * The unit of measure to be considered as the native
-     * unit of measure.
-     *
-     * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface
-     */
-    /**
      * Have the default units been configured yet for this quantity?
      *
      * @var boolean
@@ -35,7 +29,7 @@ abstract class AbstractPhysicalQuantity
     public static function registerUnitOfMeasure(UnitOfMeasureInterface $unit)
     {
         // Test for pre-existing unit name or alias conflicts
-        $currentUnits = static::getSupportedUnits($withAliases = true);
+        $currentUnits = static::getSupportedUnitNames($withAliases = true);
 
         $newUnitName = $unit->getName();
         if (in_array($newUnitName, $currentUnits)) {
@@ -64,7 +58,7 @@ abstract class AbstractPhysicalQuantity
      *
      * @return string[] the collection of unit names
      */
-    public static function getSupportedUnits($withAliases = false)
+    public static function getSupportedUnitNames($withAliases = false)
     {
         $unitDefinitions = static::getUnitsOfMeasure();
 
@@ -111,7 +105,7 @@ abstract class AbstractPhysicalQuantity
      *
      * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface[]
      */
-    protected static function getUnitsOfMeasure()
+    private static function getUnitsOfMeasure()
     {
         // If this class hasn't had its default units set, set them now
         if (!static::$hasBeenInitialized) {
@@ -131,9 +125,8 @@ abstract class AbstractPhysicalQuantity
      */
     abstract protected static function initializeUnitsOfMeasure();
 
-
     /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toNativeUnit
      */
     public function toNativeUnit()
     {
@@ -146,14 +139,21 @@ abstract class AbstractPhysicalQuantity
     /**
      * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
      */
-    public function toUnit($unit)
+    public function toUnit($toUnit)
     {
-        $nativeUnitValue = $this->toNativeUnit();
+        return $this->toUnitWithUnitOfmeasure(static::findUnitOfMeasureByNameOrAlias($toUnit));
+    }
 
-        $toUnit      = static::findUnitOfMeasureByNameOrAlias($unit);
-        $toUnitValue = $toUnit->convertValueFromNativeUnitOfMeasure($nativeUnitValue);
-
-        return $toUnitValue;
+    /**
+     * Convert this quantity to the given unit of measure.
+     *
+     * @param UnitOfMeasureInterface $unit The object representing the target unit of measure.
+     *
+     * @return float This quantity's value in the given unit of measure.
+     */
+    protected function toUnitWithUnitOfmeasure(UnitOfMeasureInterface $unit)
+    {
+        return $unit->convertValueFromNativeUnitOfMeasure($this->toNativeUnit());
     }
 
     /**
@@ -175,8 +175,9 @@ abstract class AbstractPhysicalQuantity
             );
         }
 
-        $newValue = $this->getOriginalValue() + $quantity->toUnit($this->getOriginalUnit()->getName());
+        $newValue = $this->getOriginalValue() + $quantity->toUnitWithUnitOfmeasure($this->getOriginalUnit());
 
+        // TODO not sure this is how derived quantities are going to instantiate
         return new static($newValue, $this->getOriginalUnit()->getName());
     }
 
@@ -191,8 +192,9 @@ abstract class AbstractPhysicalQuantity
             );
         }
 
-        $newValue = $this->getOriginalValue() - $quantity->toUnit($this->getOriginalUnit()->getName());
+        $newValue = $this->getOriginalValue() - $quantity->toUnitWithUnitOfmeasure($this->getOriginalUnit());
 
+        // TODO not sure this is how derived quantities are going to instantiate
         return new static($newValue, $this->getOriginalUnit()->getName());
     }
 
@@ -229,6 +231,8 @@ abstract class AbstractPhysicalQuantity
     /**
      * Determine whether two given PhysicalQuantityInterface objects represent the same
      * physical quantity.
+     *
+     * Note this is not considering magnitude.
      *
      * @param PhysicalQuantityInterface $firstQuantity
      * @param PhysicalQuantityInterface $secondQuantity
