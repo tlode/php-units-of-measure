@@ -7,17 +7,11 @@ namespace PhpUnitsOfMeasure;
 interface PhysicalQuantityInterface
 {
     /**
-     * Get the list of all supported unit names, with the option
-     * to include the units' aliases as well.
+     * Fetch the measurement in the quantity's native unit of measure
      *
-     * Note that this method is static, and the resulting list is
-     * shared between all instances of this class.
-     *
-     * @param boolean $withAliases Include all the unit alias names in the list
-     *
-     * @return string[] the collection of unit names
+     * @return float the measurement cast to the native unit of measurement
      */
-    public static function getSupportedUnits($withAliases = false);
+    public function toNativeUnit();
 
     /**
      * Fetch the measurement, in the given unit of measure
@@ -27,13 +21,6 @@ interface PhysicalQuantityInterface
      * @return float The measurement cast in the requested units
      */
     public function toUnit($unit);
-
-    /**
-     * Fetch the measurement in the quantity's native unit of measure
-     *
-     * @return float the measurement cast to the native unit of measurement
-     */
-    public function toNativeUnit();
 
     /**
      * Display the value as a string, in the original unit of measure

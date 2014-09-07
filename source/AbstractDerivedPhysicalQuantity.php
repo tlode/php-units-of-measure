@@ -16,9 +16,12 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      * The collection of known derived physical quantity
      * fully qualifed class names.
      *
+     * This array needs to be kept up to date with all the known
+     * classes in this library.
+     *
      * @var string[]
      */
-    private static $namedDerivedQuantityClasses = [
+    private static $derivedQuantityClasses = [
     ];
 
     /**
@@ -26,10 +29,10 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      *
      * @param string $className The fully qualified class name
      */
-    public static function registerNewDerivedQuantityClass($className)
+    final public static function registerNewDerivedQuantityClass($className)
     {
-        if (!in_array($className, AbstractDerivedPhysicalQuantity::$namedDerivedQuantityClasses)) {
-            AbstractDerivedPhysicalQuantity::$namedDerivedQuantityClasses[] = $className;
+        if (!in_array($className, AbstractDerivedPhysicalQuantity::$derivedQuantityClasses)) {
+            AbstractDerivedPhysicalQuantity::$derivedQuantityClasses[] = $className;
         }
     }
 
@@ -37,33 +40,33 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      * Given a set of numerator and denominator quantities, instantiate and return
      * a derived quantity.
      *
-     * @param  PhysicalQuantityInterface[] $numeratorFactors
-     * @param  PhysicalQuantityInterface[] $denominatorFactors
+     * @param  PhysicalQuantityInterface[] $numerators
+     * @param  PhysicalQuantityInterface[] $denominators
      *
      * @return AbstractDerivedPhysicalQuantity
      */
-    public static function factory(array $numeratorFactors, array $denominatorFactors)
+    final public static function factory(array $numerators, array $denominators)
     {
         // Break down all derived units until we're left with a collection of base quantities
-        list($numeratorFactors, $denominatorFactors) = AbstractDerivedPhysicalQuantity::recursiveDecomposeFactors(
-            $numeratorFactors,
-            $denominatorFactors
+        list($numerators, $denominators) = AbstractDerivedPhysicalQuantity::recursiveDecomposeFactors(
+            $numerators,
+            $denominators
         );
 
         // Cancel units to find the minimum factors necessary for this unit
-        list($numeratorFactors, $denominatorFactors) = AbstractDerivedPhysicalQuantity::reduceFactors(
-            $numeratorFactors,
-            $denominatorFactors
+        list($numerators, $denominators) = AbstractDerivedPhysicalQuantity::reduceFactors(
+            $numerators,
+            $denominators
         );
 
         // Attempt to find a derived class that represents the same collection of units
         //  If none are found, fall back to a generic unnamed derived quantity class.
-        foreach (AbstractDerivedPhysicalQuantity::$namedDerivedQuantityClasses as $className) {
-            if ($className::matchesFactors($numeratorFactors, $denominatorFactors)) {
-                return new $className($numeratorFactors, $denominatorFactors);
+        foreach (AbstractDerivedPhysicalQuantity::$derivedQuantityClasses as $className) {
+            if ($className::matchesFactors($numerators, $denominators)) {
+                return new $className($numerators, $denominators);
             }
         }
-        return new UnknownDerivedPhysicalQuantity($numeratorFactors, $denominatorFactors);
+        return new UnknownDerivedPhysicalQuantity($numerators, $denominators);
     }
 
     /**
@@ -92,28 +95,28 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
                     $subFactors[0],
                     $subFactors[1]
                 );
-                $newNumerators   = $factorNumerators;
-                $newDenominators = $factorDenominators;
+                $decomposedNumerators   = $factorNumerators;
+                $decomposedDenominators = $factorDenominators;
             } else {
-                $newNumerators   = [$factor];
-                $newDenominators = [];
+                $decomposedNumerators   = [$factor];
+                $decomposedDenominators = [];
             }
-            return [$newNumerators, $newDenominators];
+            return [$decomposedNumerators, $decomposedDenominators];
         };
 
         $resultNumerators   = [];
         $resultDenominators = [];
 
-        foreach ($numerators as $factor) {
-            list($newNumerators, $newDenominators) = $decomposeFactors($factor);
-            $resultNumerators   = array_merge($resultNumerators, $newNumerators);
-            $resultDenominators = array_merge($resultDenominators, $newDenominators);
+        foreach ($numerators as $numerator) {
+            list($decomposedNumerators, $decomposedDenominators) = $decomposeFactors($numerator);
+            $resultNumerators   = array_merge($resultNumerators, $decomposedNumerators);
+            $resultDenominators = array_merge($resultDenominators, $decomposedDenominators);
         }
 
-        foreach ($denominators as $factor) {
-            list($newNumerators, $newDenominators) = $decomposeFactors($factor);
-            $resultNumerators   = array_merge($resultNumerators, $newDenominators);
-            $resultDenominators = array_merge($resultDenominators, $newNumerators);
+        foreach ($denominators as $denominator) {
+            list($decomposedNumerators, $decomposedDenominators) = $decomposeFactors($denominator);
+            $resultNumerators   = array_merge($resultNumerators, $decomposedDenominators);
+            $resultDenominators = array_merge($resultDenominators, $decomposedNumerators);
         }
 
         return [$resultNumerators, $resultDenominators];
@@ -183,18 +186,24 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
     // *** static properties of individual child classes.      ***
     // ***********************************************************
 
-    protected static $factors = [];
-
-    public static function getDefinitionComponentQuantites()
-    {
-        return static::$factors;
-    }
+    /**
+     * The component quantities which make up the numerator
+     * and denominator for this quantity.  Represented as tuple of
+     * arrays of fully qualified class names.
+     *
+     * @var array[]
+     */
+    protected static $componentQuantities = [];
 
     /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::getSupportedUnits
+     * Fetch the set of component quantities that make up the
+     * numerator and denominator of this derived quantity.
+     *
+     * @return array[]
      */
-    public static function getSupportedUnits($withAliases = false)
+    public static function getDefinitionComponentQuantites()
     {
+        return static::$componentQuantities;
     }
 
     /**
@@ -220,17 +229,14 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
         $numeratorClasses   = array_map('get_class', $numerators);
         $denominatorClasses = array_map('get_class', $denominators);
 
-        $factors = static::getDefinitionComponentQuantites();
+        $componentQuantities = static::getDefinitionComponentQuantites();
         sort($numeratorClasses);
         sort($denominatorClasses);
-        sort($factors[0]);
-        sort($factors[1]);
+        sort($componentQuantities[0]);
+        sort($componentQuantities[1]);
 
         // If the array sets aren't equivalent, then this is not a match
-        if ($numeratorClasses === $factors[0] && $denominatorClasses === $factors[1]) {
-            return true;
-        }
-        return false;
+        return ($numeratorClasses === $componentQuantities[0] && $denominatorClasses === $componentQuantities[1]);
     }
 
 
@@ -238,20 +244,30 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
     // *** Individual instance members ***
     // ***********************************
 
-    protected $numeratorFactors = [];
+    /**
+     * The physical quantities which make up the numerator of this quantity.
+     *
+     * @var PhysicalQuantityInterface[]
+     */
+    protected $numerators = [];
 
-    protected $denominatorFactors = [];
+    /**
+     * The physical quantities which make up the denominator of this quantity.
+     *
+     * PhysicalQuantityInterface[]
+     */
+    protected $denominators = [];
 
     /**
      * This constructor is protected, to force the usage of the static factory() method above.
      *
-     * @param PhysicalQuantityInterface[] $numeratorFactors
-     * @param PhysicalQuantityInterface[] $numeratorFactors
+     * @param PhysicalQuantityInterface[] $numerators
+     * @param PhysicalQuantityInterface[] $denominators
      */
-    protected function __construct(array $numeratorFactors, array $denominatorFactors)
+    protected function __construct(array $numerators, array $denominators)
     {
-        $this->numeratorFactors   = array_values($numeratorFactors);
-        $this->denominatorFactors = array_values($denominatorFactors);
+        $this->numerators   = array_values($numerators);
+        $this->denominators = array_values($denominators);
     }
 
     /**
@@ -262,34 +278,43 @@ abstract class AbstractDerivedPhysicalQuantity extends AbstractPhysicalQuantity 
      */
     public function getComponentFactors()
     {
-        return [$this->numeratorFactors, $this->denominatorFactors];
+        return [$this->numerators, $this->denominators];
     }
 
     /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::isSameQuantity
+     * @see \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getOriginalValue
+     */
+    protected function getOriginalValue()
+    {
+        list($numerators, $denominators) = $this->getComponentFactors();
+
+        $value = 1;
+        foreach ($numerators as $numerator) {
+            $value *= $numerator->getOriginalValue();
+        }
+        foreach ($numerators as $numerator) {
+            $value /= $numerator->getOriginalValue();
+        }
+
+        return $value;
+    }
+
+    /**
+     * @see \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getOriginalUnit
+     */
+    protected function getOriginalUnit()
+    {
+        // TODO not yet implemented
+    }
+
+    /**
+     * For these base quantities, we can assume the quantites are the same if their classes
+     * are the same.
+     *
+     * @see \PhpUnitsOfMeasure\AbstractPhysicalQuantity::isSameQuantity
      */
     protected function isSameQuantity(PhysicalQuantityInterface $firstQuantity, PhysicalQuantityInterface $secondQuantity)
     {
-    }
-
-    /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
-     */
-    public function toUnit($unit)
-    {
-    }
-
-    /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
-     */
-    public function toNativeUnit()
-    {
-    }
-
-    /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::__toString
-     */
-    public function __toString()
-    {
+        // TODO not yet implemented
     }
 }

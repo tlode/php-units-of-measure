@@ -14,4 +14,11 @@ class DimensionlessCoefficientTest extends AbstractPhysicalQuantityTestCase
     {
         return new DimensionlessCoefficient(1);
     }
+
+    public function testConvertToNativeValue()
+    {
+        $value = new DimensionlessCoefficient(5);
+
+        $this->assertSame(5, $value->toNativeUnit());
+    }
 }

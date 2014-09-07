@@ -6,7 +6,7 @@ use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
 class Pumpalumpiness extends AbstractDerivedPhysicalQuantity
 {
     // need a way to specify the quantites that make up this type.  maybe something like...
-    public static $factors = [
+    public static $componentQuantities = [
         ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess'],
         ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity']
     ];
@@ -24,4 +24,16 @@ class Pumpalumpiness extends AbstractDerivedPhysicalQuantity
     //         ['glergs']
     //     ],
     // ];
+
+    protected static $unitDefinitions = [];
+
+    protected static $hasBeenInitialized = false;
+
+    protected static $nativeUnitOfMeasure;
+
+    protected static function initializeUnitsOfMeasure()
+    {
+        // $coefficient = UnitOfMeasure::nativeUnitFactory('');
+        // static::registerNativeUnitOfMeasure($coefficient);
+    }
 }

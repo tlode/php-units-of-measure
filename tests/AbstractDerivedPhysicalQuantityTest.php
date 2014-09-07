@@ -6,6 +6,7 @@ use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
+use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness;
 use PhpUnitsOfMeasure\PhysicalQuantity\DimensionlessCoefficient;
 
 class AbstractDerivedPhysicalQuantityTest extends \PHPUnit_Framework_TestCase
@@ -202,9 +203,70 @@ class AbstractDerivedPhysicalQuantityTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness', $quantityA);
     }
 
+    /**
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getDefinitionComponentQuantites
+     */
+    public function testGetDefinitionComponentQuantites()
+    {
+        $quantities = Pumpalumpiness::getDefinitionComponentQuantites();
 
+        $this->assertSame(
+            [
+                'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity',
+                'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess',
+                'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess'
+            ],
+            $quantities[0]
+        );
 
+        $this->assertSame(
+            [
+                'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity',
+                'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity'
+            ],
+            $quantities[1]
+        );
+    }
 
+    /**
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getSupportedUnits
+     */
+    public function testGetSupportedUnits()
+    {
+        $quantities = Pumpalumpiness::getSupportedUnits($withAliases = false);
+
+        // // Quatloos
+        // $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
+        // Woogosity::registerUnitOfMeasure($newUnit);
+
+        // // Schmoos
+        // $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
+        // Woogosity::registerUnitOfMeasure($newUnit);
+
+        // $this->assertArraySameValues(
+        //     ['l', 'p', 'quatloos', 'schmoos'],
+        //     Woogosity::getSupportedUnits()
+        // );
+    }
+
+    /**
+     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getSupportedUnits
+     */
+    public function testGetSupportedUnitsWithAliases()
+    {
+        // // Quatloos
+        // $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
+        // Woogosity::registerUnitOfMeasure($newUnit);
+
+        // // Schmoos
+        // $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
+        // Woogosity::registerUnitOfMeasure($newUnit);
+
+        // $this->assertArraySameValues(
+        //     ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
+        //     Woogosity::getSupportedUnits(true)
+        // );
+    }
 
 
 

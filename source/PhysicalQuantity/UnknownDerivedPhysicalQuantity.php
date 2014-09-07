@@ -11,4 +11,15 @@ use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
  */
 class UnknownDerivedPhysicalQuantity extends AbstractDerivedPhysicalQuantity
 {
+    protected static $unitDefinitions = [];
+
+    protected static $hasBeenInitialized = false;
+
+    protected static $nativeUnitOfMeasure;
+
+    protected static function initializeUnitsOfMeasure()
+    {
+        // $coefficient = UnitOfMeasure::nativeUnitFactory('');
+        // static::registerNativeUnitOfMeasure($coefficient);
+    }
 }
