@@ -6,7 +6,7 @@ namespace PhpUnitsOfMeasure;
  * provides the infrastructure necessary for storing quantities and converting
  * between different units of measure.
  */
-abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements PhysicalQuantityInterface
+abstract class AbstractBasePhysicalQuantity extends AbstractPhysicalQuantity implements PhysicalQuantityInterface
 {
     /**
      * The collection of units of measure in which this quantity can
@@ -14,7 +14,7 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
      *
      * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface[]
      */
-    static protected $unitDefinitions = [];
+    protected static $unitDefinitions = [];
 
     /**
      * The unit of measure to be considered as the native
@@ -22,14 +22,14 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
      *
      * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface
      */
-    static protected $nativeUnitOfMeasure;
+    protected static $nativeUnitOfMeasure;
 
     /**
      * Have the default units been configured yet for this quantity?
      *
      * @var boolean
      */
-    static protected $hasBeenInitialized = false;
+    protected static $hasBeenInitialized = false;
 
     /**
      * Register a new Unit of Measure with this quantity.
@@ -39,16 +39,16 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
      *
      * @param \PhpUnitsOfMeasure\UnitOfMeasureInterface $unit The new unit of measure
      */
-    static public function registerUnitOfMeasure(UnitOfMeasureInterface $unit)
+    public static function registerUnitOfMeasure(UnitOfMeasureInterface $unit)
     {
         // If this class hasn't had its default units set, set them now
         if (!static::$hasBeenInitialized) {
             static::$hasBeenInitialized = true;
-            static::registerDefaultUnitsOfMeasure();
+            static::initializeUnitsOfMeasure();
         }
 
         // Test for pre-existing unit name or alias conflicts
-        $currentUnits = static::getSupportedUnits(true);
+        $currentUnits = static::getSupportedUnits($withAliases = true);
 
         $newUnitName = $unit->getName();
         if (in_array($newUnitName, $currentUnits)) {
@@ -67,29 +67,37 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
     }
 
     /**
-     * [registerNativeUnitOfMeasure description]
-     * @param  UnitOfMeasureInterface $unit [description]
-     * @return [type]                       [description]
+     * Establish a "native" unit of measure for this physical quantity.
+     *
+     * This unit is typically the SI standard for this physical quantity.
+     *
+     * This is typically called from static::initializeUnitsOfMeasure(),
+     * during the static initalization of a physical quantity class.
+     *
+     * @param UnitOfMeasureInterface $nativeUnit The new native unit of measure.
      */
-    static protected function registerNativeUnitOfMeasure(UnitOfMeasureInterface $unit)
+    protected static function registerNativeUnitOfMeasure(UnitOfMeasureInterface $nativeUnit)
     {
+        // First, attempt to register the unit in the list of units of measure that
+        // this quantity supports.  Ignore any duplication errors that occur, its ok
+        // if this unit is already present.
         try {
-            static::registerUnitOfMeasure($unit);
+            static::registerUnitOfMeasure($nativeUnit);
         } catch (Exception\DuplicateUnitNameOrAlias $e) {
         }
 
-        static::$nativeUnitOfMeasure = $unit;
+        static::$nativeUnitOfMeasure = $nativeUnit;
     }
 
     /**
      * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::getSupportedUnits
      */
-    static public function getSupportedUnits($withAliases = false)
+    public static function getSupportedUnits($withAliases = false)
     {
         // If this class hasn't had its default units set, set them now
         if (!static::$hasBeenInitialized) {
             static::$hasBeenInitialized = true;
-            static::registerDefaultUnitsOfMeasure();
+            static::initializeUnitsOfMeasure();
         }
 
         $units = [];
@@ -116,12 +124,12 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
      *
      * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface
      */
-    static private function findUnitOfMeasureByNameOrAlias($unit)
+    private static function findUnitOfMeasureByNameOrAlias($unit)
     {
         // If this class hasn't had its default units set, set them now
         if (!static::$hasBeenInitialized) {
             static::$hasBeenInitialized = true;
-            static::registerDefaultUnitsOfMeasure();
+            static::initializeUnitsOfMeasure();
         }
 
         foreach (static::$unitDefinitions as $unitOfMeasure) {
@@ -135,8 +143,12 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
 
     /**
      * Initialize the set of default units of measure for this quantity.
+     *
+     * This should include any generally used units of measure through
+     * static::registerUnitOfMeasure, and also the native unit of measure through
+     * static::registerNativeUnitOfMeasure().
      */
-    abstract static protected function registerDefaultUnitsOfMeasure();
+    abstract protected static function initializeUnitsOfMeasure();
 
     /**
      * The scalar value, in the original unit of measure.
@@ -188,8 +200,7 @@ abstract class BasePhysicalQuantity extends AbstractPhysicalQuantity implements 
      */
     public function toUnit($unit)
     {
-        $originalUnit    = static::findUnitOfMeasureByNameOrAlias($this->originalUnit);
-        $nativeUnitValue = $originalUnit->convertValueToNativeUnitOfMeasure($this->originalValue);
+        $nativeUnitValue = $this->toNativeUnit();
 
         $toUnit      = static::findUnitOfMeasureByNameOrAlias($unit);
         $toUnitValue = $toUnit->convertValueFromNativeUnitOfMeasure($nativeUnitValue);

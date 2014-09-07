@@ -1,18 +1,18 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\BasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Area extends BasePhysicalQuantity
+class Area extends AbstractBasePhysicalQuantity
 {
-    static protected $unitDefinitions = [];
+    protected static $unitDefinitions = [];
 
-    static protected $hasBeenInitialized = false;
+    protected static $hasBeenInitialized = false;
 
-    static protected $nativeUnitOfMeasure;
+    protected static $nativeUnitOfMeasure;
 
-    static protected function registerDefaultUnitsOfMeasure()
+    protected static function initializeUnitsOfMeasure()
     {
         // Meters squared
         $metersquared = UnitOfMeasure::nativeUnitFactory('m^2');

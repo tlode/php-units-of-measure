@@ -36,7 +36,7 @@ abstract class AbstractPhysicalQuantity
      */
     public function multiplyBy(PhysicalQuantityInterface $quantity)
     {
-        return DerivedPhysicalQuantity::factory([$this, $quantity], []);
+        return AbstractDerivedPhysicalQuantity::factory([$this, $quantity], []);
     }
 
     /**
@@ -44,20 +44,17 @@ abstract class AbstractPhysicalQuantity
      */
     public function divideBy(PhysicalQuantityInterface $quantity)
     {
-        return DerivedPhysicalQuantity::factory([$this], [$quantity]);
+        return AbstractDerivedPhysicalQuantity::factory([$this], [$quantity]);
     }
 
     /**
-     * Given two quantities, determine whether they represent the same
-     * quantity.
-     *
-     * For base units, this is simply comparing types.  For derived units,
-     * it's a more complicated case of comparing units.
+     * Determine whether two given PhysicalQuantityInterface objects represent the same
+     * physical quantity.
      *
      * @param  PhysicalQuantityInterface $firstQuantity
      * @param  PhysicalQuantityInterface $secondQuantity
      *
-     * @return boolean True if both quantities represent the same dimensional values.
+     * @return boolean True if the quantities are the same, false if not.
      */
     abstract protected function isSameQuantity(PhysicalQuantityInterface $firstQuantity, PhysicalQuantityInterface $secondQuantity);
 }

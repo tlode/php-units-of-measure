@@ -36,7 +36,7 @@ trait HasSIUnitsTrait
      * @param  string        $namePattern        The pattern to apply to the base unit's name to generate a new SI unit name
      * @param  array         $aliasPatterns      The collection of alias patterns to use in generating a new SI unit's aliases
      */
-    static protected function addMissingSIPrefixedUnits(
+    protected static function addMissingSIPrefixedUnits(
         UnitOfMeasure $siUnit,
         $toBaseSiUnitFactor,
         $namePattern,
@@ -157,7 +157,7 @@ trait HasSIUnitsTrait
         $noPrefixToNativeUnitFactor = $siUnit->convertValueToNativeUnitOfMeasure(1) * $toBaseSiUnitFactor;
 
         // Identify the current set of unit names, so we can avoid duplicates
-        $existingUnitNames = static::getSupportedUnits(true);
+        $existingUnitNames = static::getSupportedUnits($withAliases = true);
 
         // For each of the standard SI prefixes, attempt to register a new unit of measure
         foreach ($siPrefixes as $prefixDefinition) {

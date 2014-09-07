@@ -1,7 +1,7 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\BasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
 /**
@@ -9,15 +9,15 @@ use PhpUnitsOfMeasure\UnitOfMeasure;
  * quantity.  It's used, for instance, as a placeholder when
  * cancelling values in derived quantities.
  */
-class DimensionlessCoefficient extends BasePhysicalQuantity
+class DimensionlessCoefficient extends AbstractBasePhysicalQuantity
 {
-    static protected $unitDefinitions = [];
+    protected static $unitDefinitions = [];
 
-    static protected $hasBeenInitialized = false;
+    protected static $hasBeenInitialized = false;
 
-    static protected $nativeUnitOfMeasure;
+    protected static $nativeUnitOfMeasure;
 
-    static protected function registerDefaultUnitsOfMeasure()
+    protected static function initializeUnitsOfMeasure()
     {
         $coefficient = UnitOfMeasure::nativeUnitFactory('');
         static::registerNativeUnitOfMeasure($coefficient);

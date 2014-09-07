@@ -1,18 +1,18 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\BasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Volume extends BasePhysicalQuantity
+class Volume extends AbstractBasePhysicalQuantity
 {
-    static protected $unitDefinitions = [];
+    protected static $unitDefinitions = [];
 
-    static protected $hasBeenInitialized = false;
+    protected static $hasBeenInitialized = false;
 
-    static protected $nativeUnitOfMeasure;
+    protected static $nativeUnitOfMeasure;
 
-    static protected function registerDefaultUnitsOfMeasure()
+    protected static function initializeUnitsOfMeasure()
     {
         // Cubic meter
         $cubicmeter = UnitOfMeasure::nativeUnitFactory('m^3');

@@ -17,7 +17,7 @@ interface PhysicalQuantityInterface
      *
      * @return string[] the collection of unit names
      */
-    static public function getSupportedUnits($withAliases = false);
+    public static function getSupportedUnits($withAliases = false);
 
     /**
      * Fetch the measurement, in the given unit of measure
@@ -80,19 +80,19 @@ interface PhysicalQuantityInterface
      *
      * @param PhysicalQuantityInterface $quantity The value by which to multiply this unit.
      *
-     * @return DerivedPhysicalQuantity
+     * @return AbstractDerivedPhysicalQuantity
      */
     public function multiplyBy(PhysicalQuantityInterface $quantity);
 
     /**
      * Divide this quantity by a given quantity, and return a new quantity object.
      *
-     * The new quantity will be a compound quantity who's unit will be the
+     * The new quantity will be a derived quantity who's unit will be the
      * this quantity's units divided by the given quantity's unit.
      *
      * @param PhysicalQuantityInterface $quantity The value by which to divide this unit.
      *
-     * @return DerivedPhysicalQuantity
+     * @return AbstractDerivedPhysicalQuantity
      */
     public function divideBy(PhysicalQuantityInterface $quantity);
 }

@@ -152,7 +152,7 @@ use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Mass extends BasePhysicalQuantity
+class Mass extends AbstractBasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -195,7 +195,7 @@ namespace PhpUnitsOfMeasure\PhysicalQuantity;
 use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Length extends BasePhysicalQuantity
+class Length extends AbstractBasePhysicalQuantity
 {
     public function __construct($value, $unit)
     {

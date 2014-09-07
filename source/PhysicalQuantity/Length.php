@@ -1,21 +1,21 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\BasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Length extends BasePhysicalQuantity
+class Length extends AbstractBasePhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    static protected $unitDefinitions = [];
+    protected static $unitDefinitions = [];
 
-    static protected $hasBeenInitialized = false;
+    protected static $hasBeenInitialized = false;
 
-    static protected $nativeUnitOfMeasure;
+    protected static $nativeUnitOfMeasure;
 
-    static protected function registerDefaultUnitsOfMeasure()
+    protected static function initializeUnitsOfMeasure()
     {
         // Meter
         $meter = UnitOfMeasure::nativeUnitFactory('m');

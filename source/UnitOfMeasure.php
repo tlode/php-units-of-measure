@@ -59,8 +59,6 @@ class UnitOfMeasure implements UnitOfMeasureInterface
      *
      * @param string $name               This unit of measure's canonical name
      * @param float  $toNativeUnitFactor The factor to scale the unit by where factor * base unit = this unit
-     *
-     * @return void
      */
     public static function linearUnitFactory($name, $toNativeUnitFactor)
     {
@@ -80,8 +78,6 @@ class UnitOfMeasure implements UnitOfMeasureInterface
      * for a given physical quantity.  By definition, the conversion factor is 1.
      *
      * @param string $name This unit of measure's canonical name
-     *
-     * @return void
      */
     public static function nativeUnitFactory($name)
     {
@@ -94,8 +90,6 @@ class UnitOfMeasure implements UnitOfMeasureInterface
      * @param string   $name           This unit of measure's canonical name
      * @param callable $fromNativeUnit The callable that can cast values into this unit of measure from the native unit of measure
      * @param callable $toNativeUnit   The callable that can cast values into the native unit from this unit of measure
-     *
-     * @return void
      */
     public function __construct($name, callable $fromNativeUnit, callable $toNativeUnit)
     {
