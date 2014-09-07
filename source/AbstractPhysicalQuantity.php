@@ -91,7 +91,7 @@ abstract class AbstractPhysicalQuantity
      */
     public static function getSupportedUnits($withAliases = false)
     {
-        $unitDefinitions = static::getUnitDefinitions();
+        $unitDefinitions = static::getUnitsOfMeasure();
 
         $units = [];
         foreach ($unitDefinitions as $unitOfMeasure) {
@@ -119,7 +119,7 @@ abstract class AbstractPhysicalQuantity
      */
     protected static function findUnitOfMeasureByNameOrAlias($unit)
     {
-        $unitDefinitions = static::getUnitDefinitions();
+        $unitDefinitions = static::getUnitsOfMeasure();
         foreach ($unitDefinitions as $unitOfMeasure) {
             if ($unit === $unitOfMeasure->getName() || $unitOfMeasure->isAliasOf($unit)) {
                 return $unitOfMeasure;
@@ -136,7 +136,7 @@ abstract class AbstractPhysicalQuantity
      *
      * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface[]
      */
-    protected static function getUnitDefinitions()
+    protected static function getUnitsOfMeasure()
     {
         // If this class hasn't had its default units set, set them now
         if (!static::$hasBeenInitialized) {

@@ -9,8 +9,43 @@ use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness;
 use PhpUnitsOfMeasure\PhysicalQuantity\DimensionlessCoefficient;
 
-class AbstractDerivedPhysicalQuantityTest extends \PHPUnit_Framework_TestCase
+class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
 {
+     /**
+     * @before
+     */
+    public function resetStaticProperty()
+    {
+        $fieldInitValues = [
+            'unitDefinitions'     => [],
+            'hasBeenInitialized'  => false,
+            'nativeUnitOfMeasure' => null,
+        ];
+
+        foreach ($fieldInitValues as $fieldName => $fieldValue) {
+            $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity'))
+                ->getProperty($fieldName);
+            $property->setAccessible(true);
+            $property->setValue($fieldValue);
+            $property->setAccessible(false);
+        }
+
+        $fieldInitValues = [
+            'unitDefinitions'     => [],
+            'hasBeenInitialized'  => false,
+            'nativeUnitOfMeasure' => null,
+        ];
+
+        foreach ($fieldInitValues as $fieldName => $fieldValue) {
+            $property = (new \ReflectionClass('\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness'))
+                ->getProperty($fieldName);
+            $property->setAccessible(true);
+            $property->setValue($fieldValue);
+            $property->setAccessible(false);
+        }
+    }
+
+
     /**
      * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
      */
@@ -226,60 +261,5 @@ class AbstractDerivedPhysicalQuantityTest extends \PHPUnit_Framework_TestCase
             ],
             $quantities[1]
         );
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getSupportedUnits
-     */
-    public function testGetSupportedUnits()
-    {
-        $quantities = Pumpalumpiness::getSupportedUnits($withAliases = false);
-
-        // // Quatloos
-        // $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
-        // Woogosity::registerUnitOfMeasure($newUnit);
-
-        // // Schmoos
-        // $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
-        // Woogosity::registerUnitOfMeasure($newUnit);
-
-        // $this->assertArraySameValues(
-        //     ['l', 'p', 'quatloos', 'schmoos'],
-        //     Woogosity::getSupportedUnits()
-        // );
-    }
-
-    /**
-     * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getSupportedUnits
-     */
-    public function testGetSupportedUnitsWithAliases()
-    {
-        // // Quatloos
-        // $newUnit = $this->getMockUnitOfMeasure('quatloos', ['qa', 'qs']);
-        // Woogosity::registerUnitOfMeasure($newUnit);
-
-        // // Schmoos
-        // $newUnit = $this->getMockUnitOfMeasure('schmoos', ['sc', 'sm']);
-        // Woogosity::registerUnitOfMeasure($newUnit);
-
-        // $this->assertArraySameValues(
-        //     ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-        //     Woogosity::getSupportedUnits(true)
-        // );
-    }
-
-
-
-    /**
-     * Assert that two arrays have the same values, regardless of the order.
-     *
-     * @param  array  $expected
-     * @param  array  $actual
-     */
-    public function assertArraySameValues(array $expected, array $actual)
-    {
-        asort($expected);
-        asort($actual);
-        $this->assertSame($expected, $actual);
     }
 }
