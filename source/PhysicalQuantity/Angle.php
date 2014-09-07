@@ -13,15 +13,13 @@ class Angle extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Radians
         $radian = UnitOfMeasure::nativeUnitFactory('rad');
         $radian->addAlias('radian');
         $radian->addAlias('radians');
-        static::registerNativeUnitOfMeasure($radian);
+        static::registerUnitOfMeasure($radian);
 
         static::addMissingSIPrefixedUnits(
             $radian,

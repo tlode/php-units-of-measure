@@ -3,7 +3,7 @@
   - As part of this change, default units of measure are no longer added in the quantity class constructor, and are instead handled in a initializeUnitsOfMeasure() static method.
   - registerUnitOfMeasure() and getSupportedUnits() are now static methods.
 - Physical quantities now have an abstract interface to implement - PhysicalQuantityInterface
-
+- Make sure the native unit of measure idea is still necessary
 
 ## v1.3.1 (August 23rd, 2014)
 - Added information in the README about the new SI prefix units generation

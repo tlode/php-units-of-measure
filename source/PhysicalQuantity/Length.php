@@ -13,8 +13,6 @@ class Length extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Meter
@@ -23,7 +21,7 @@ class Length extends AbstractBasePhysicalQuantity
         $meter->addAlias('meters');
         $meter->addAlias('metre');
         $meter->addAlias('metres');
-        static::registerNativeUnitOfMeasure($meter);
+        static::registerUnitOfMeasure($meter);
 
         static::addMissingSIPrefixedUnits(
             $meter,

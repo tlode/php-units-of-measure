@@ -10,8 +10,6 @@ class Velocity extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // meter per second
@@ -20,6 +18,6 @@ class Velocity extends AbstractBasePhysicalQuantity
         $meterpersecond->addAlias('meter per second');
         $meterpersecond->addAlias('metres per second');
         $meterpersecond->addAlias('metre per second');
-        static::registerNativeUnitOfMeasure($meterpersecond);
+        static::registerUnitOfMeasure($meterpersecond);
     }
 }

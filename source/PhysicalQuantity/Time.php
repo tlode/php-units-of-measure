@@ -13,8 +13,6 @@ class Time extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Second
@@ -23,7 +21,7 @@ class Time extends AbstractBasePhysicalQuantity
         $second->addAlias('secs');
         $second->addAlias('second');
         $second->addAlias('seconds');
-        static::registerNativeUnitOfMeasure($second);
+        static::registerUnitOfMeasure($second);
 
         static::addMissingSIPrefixedUnits(
             $second,

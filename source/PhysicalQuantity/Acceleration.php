@@ -10,8 +10,6 @@ class Acceleration extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // meters per second squared
@@ -21,6 +19,6 @@ class Acceleration extends AbstractBasePhysicalQuantity
         $meterpersecondsquared->addAlias('meters per second squared');
         $meterpersecondsquared->addAlias('metre per second squared');
         $meterpersecondsquared->addAlias('metres per second squared');
-        static::registerNativeUnitOfMeasure($meterpersecondsquared);
+        static::registerUnitOfMeasure($meterpersecondsquared);
     }
 }

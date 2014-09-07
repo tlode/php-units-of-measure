@@ -13,15 +13,13 @@ class Temperature extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Kelvin
         $kelvin = UnitOfMeasure::nativeUnitFactory('K');
         $kelvin->addAlias('°K');
         $kelvin->addAlias('kelvin');
-        static::registerNativeUnitOfMeasure($kelvin);
+        static::registerUnitOfMeasure($kelvin);
 
         static::addMissingSIPrefixedUnits(
             $kelvin,

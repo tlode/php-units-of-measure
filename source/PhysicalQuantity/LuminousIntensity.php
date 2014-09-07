@@ -13,14 +13,12 @@ class LuminousIntensity extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Candela
         $candela = UnitOfMeasure::nativeUnitFactory('cd');
         $candela->addAlias('candela');
-        static::registerNativeUnitOfMeasure($candela);
+        static::registerUnitOfMeasure($candela);
 
         static::addMissingSIPrefixedUnits(
             $candela,

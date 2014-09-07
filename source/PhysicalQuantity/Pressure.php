@@ -13,14 +13,12 @@ class Pressure extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Pascal
         $pascal = UnitOfMeasure::nativeUnitFactory('Pa');
         $pascal->addAlias('pascal');
-        static::registerNativeUnitOfMeasure($pascal);
+        static::registerUnitOfMeasure($pascal);
 
         static::addMissingSIPrefixedUnits(
             $pascal,

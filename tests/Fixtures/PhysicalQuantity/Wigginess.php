@@ -9,14 +9,12 @@ class Wigginess extends AbstractBasePhysicalQuantity
 {
     protected static $unitDefinitions    = [];
     protected static $hasBeenInitialized = false;
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         $native = UnitOfMeasure::nativeUnitFactory('s');
         $native->addAlias('sopee');
         $native->addAlias('sopees');
-        static::registerNativeUnitOfMeasure($native);
+        static::registerUnitOfMeasure($native);
 
         $unit = UnitOfMeasure::linearUnitFactory('t', 2.345);
         $unit->addAlias('tumpet');

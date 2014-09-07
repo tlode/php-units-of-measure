@@ -10,8 +10,6 @@ class Volume extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Cubic meter
@@ -21,7 +19,7 @@ class Volume extends AbstractBasePhysicalQuantity
         $cubicmeter->addAlias('cubic meters');
         $cubicmeter->addAlias('cubic metre');
         $cubicmeter->addAlias('cubic metres');
-        static::registerNativeUnitOfMeasure($cubicmeter);
+        static::registerUnitOfMeasure($cubicmeter);
 
         // Cubic millimeter
         $newUnit = UnitOfMeasure::linearUnitFactory('mm^3', 1e-9);

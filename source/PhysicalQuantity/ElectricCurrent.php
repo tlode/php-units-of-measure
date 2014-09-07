@@ -13,8 +13,6 @@ class ElectricCurrent extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Ampere
@@ -23,7 +21,7 @@ class ElectricCurrent extends AbstractBasePhysicalQuantity
         $ampere->addAlias('amps');
         $ampere->addAlias('ampere');
         $ampere->addAlias('amperes');
-        static::registerNativeUnitOfMeasure($ampere);
+        static::registerUnitOfMeasure($ampere);
 
         static::addMissingSIPrefixedUnits(
             $ampere,

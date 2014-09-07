@@ -53,7 +53,7 @@ abstract class AbstractBasePhysicalQuantity extends AbstractPhysicalQuantity imp
      */
     protected function getOriginalUnit()
     {
-        return $this->originalUnit;
+        return static::findUnitOfMeasureByNameOrAlias($this->originalUnit);
     }
 
     /**

@@ -10,8 +10,6 @@ class Area extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Meters squared
@@ -21,7 +19,7 @@ class Area extends AbstractBasePhysicalQuantity
         $metersquared->addAlias('meters squared');
         $metersquared->addAlias('metre squared');
         $metersquared->addAlias('metres squared');
-        static::registerNativeUnitOfMeasure($metersquared);
+        static::registerUnitOfMeasure($metersquared);
 
         // Millimeter squared
         $newUnit = UnitOfMeasure::linearUnitFactory('mm^2', 1e-6);

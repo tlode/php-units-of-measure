@@ -11,8 +11,8 @@ use PhpUnitsOfMeasure\PhysicalQuantity\DimensionlessCoefficient;
 
 class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
 {
-    protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity';
-    protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity';
+    protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness';
+    protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Plooposity';
 
     protected function getTestUnitOfMeasure($name, $aliases = [])
     {

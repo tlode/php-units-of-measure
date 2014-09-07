@@ -17,8 +17,6 @@ abstract class AbstractPhysicalQuantity
      *
      * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface
      */
-    protected static $nativeUnitOfMeasure;
-
     /**
      * Have the default units been configured yet for this quantity?
      *
@@ -53,29 +51,6 @@ abstract class AbstractPhysicalQuantity
 
         // Store the new unit in the list of units for this quantity
         static::$unitDefinitions[] = $unit;
-    }
-
-    /**
-     * Establish a "native" unit of measure for this physical quantity.
-     *
-     * This unit is typically the SI standard for this physical quantity.
-     *
-     * This is typically called from static::initializeUnitsOfMeasure(),
-     * during the static initalization of a physical quantity class.
-     *
-     * @param UnitOfMeasureInterface $nativeUnit The new native unit of measure.
-     */
-    protected static function registerNativeUnitOfMeasure(UnitOfMeasureInterface $nativeUnit)
-    {
-        // First, attempt to register the unit in the list of units of measure that
-        // this quantity supports.  Ignore any duplication errors that occur, its ok
-        // if this unit is already present.
-        try {
-            static::registerUnitOfMeasure($nativeUnit);
-        } catch (Exception\DuplicateUnitNameOrAlias $e) {
-        }
-
-        static::$nativeUnitOfMeasure = $nativeUnit;
     }
 
     /**
@@ -152,7 +127,7 @@ abstract class AbstractPhysicalQuantity
      *
      * This should include any generally used units of measure through
      * static::registerUnitOfMeasure, and also the native unit of measure through
-     * static::registerNativeUnitOfMeasure().
+     * static::registerUnitOfMeasure().
      */
     abstract protected static function initializeUnitsOfMeasure();
 
@@ -162,7 +137,7 @@ abstract class AbstractPhysicalQuantity
      */
     public function toNativeUnit()
     {
-        $originalUnit    = static::findUnitOfMeasureByNameOrAlias($this->getOriginalUnit());
+        $originalUnit    = $this->getOriginalUnit();
         $nativeUnitValue = $originalUnit->convertValueToNativeUnitOfMeasure($this->getOriginalValue());
 
         return $nativeUnitValue;
@@ -186,10 +161,7 @@ abstract class AbstractPhysicalQuantity
      */
     public function __toString()
     {
-        $originalUnit = static::findUnitOfMeasureByNameOrAlias($this->getOriginalUnit());
-        $canonicalUnitName = $originalUnit->getName();
-
-        return $this->getOriginalValue() . ' ' . $canonicalUnitName;
+        return $this->getOriginalValue() . ' ' . $this->getOriginalUnit()->getName();
     }
 
     /**
@@ -203,9 +175,9 @@ abstract class AbstractPhysicalQuantity
             );
         }
 
-        $newValue = $this->getOriginalValue() + $quantity->toUnit($this->getOriginalUnit());
+        $newValue = $this->getOriginalValue() + $quantity->toUnit($this->getOriginalUnit()->getName());
 
-        return new static($newValue, $this->getOriginalUnit());
+        return new static($newValue, $this->getOriginalUnit()->getName());
     }
 
     /**
@@ -219,9 +191,9 @@ abstract class AbstractPhysicalQuantity
             );
         }
 
-        $newValue = $this->getOriginalValue() - $quantity->toUnit($this->getOriginalUnit());
+        $newValue = $this->getOriginalValue() - $quantity->toUnit($this->getOriginalUnit()->getName());
 
-        return new static($newValue, $this->getOriginalUnit());
+        return new static($newValue, $this->getOriginalUnit()->getName());
     }
 
     /**
@@ -250,7 +222,7 @@ abstract class AbstractPhysicalQuantity
     /**
      * Get this quantity's original units of measure.
      *
-     * @return string
+     * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface
      */
     abstract protected function getOriginalUnit();
 

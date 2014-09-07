@@ -9,14 +9,12 @@ class Wonkicity extends AbstractBasePhysicalQuantity
 {
     protected static $unitDefinitions    = [];
     protected static $hasBeenInitialized = false;
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         $native = UnitOfMeasure::nativeUnitFactory('u');
         $native->addAlias('uvee');
         $native->addAlias('uvees');
-        static::registerNativeUnitOfMeasure($native);
+        static::registerUnitOfMeasure($native);
 
         $unit = UnitOfMeasure::linearUnitFactory('v', 3.456);
         $unit->addAlias('vorp');

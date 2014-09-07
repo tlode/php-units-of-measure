@@ -13,15 +13,13 @@ class Mass extends AbstractBasePhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // Kilogram
         $kilogram = UnitOfMeasure::nativeUnitFactory('kg');
         $kilogram->addAlias('kilogram');
         $kilogram->addAlias('kilograms');
-        static::registerNativeUnitOfMeasure($kilogram);
+        static::registerUnitOfMeasure($kilogram);
 
         static::addMissingSIPrefixedUnits(
             $kilogram,

@@ -15,11 +15,9 @@ class UnknownDerivedPhysicalQuantity extends AbstractDerivedPhysicalQuantity
 
     protected static $hasBeenInitialized = false;
 
-    protected static $nativeUnitOfMeasure;
-
     protected static function initializeUnitsOfMeasure()
     {
         // $coefficient = UnitOfMeasure::nativeUnitFactory('');
-        // static::registerNativeUnitOfMeasure($coefficient);
+        // static::registerUnitOfMeasure($coefficient);
     }
 }
