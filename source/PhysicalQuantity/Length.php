@@ -1,19 +1,17 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Length extends AbstractBasePhysicalQuantity
+class Length extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // Meter
         $meter = UnitOfMeasure::nativeUnitFactory('m');
@@ -21,7 +19,7 @@ class Length extends AbstractBasePhysicalQuantity
         $meter->addAlias('meters');
         $meter->addAlias('metre');
         $meter->addAlias('metres');
-        static::registerUnitOfMeasure($meter);
+        static::addUnit($meter);
 
         static::addMissingSIPrefixedUnits(
             $meter,
@@ -39,24 +37,24 @@ class Length extends AbstractBasePhysicalQuantity
         $newUnit = UnitOfMeasure::linearUnitFactory('ft', 0.3048);
         $newUnit->addAlias('foot');
         $newUnit->addAlias('feet');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Inch
         $newUnit = UnitOfMeasure::linearUnitFactory('in', 0.0254);
         $newUnit->addAlias('inch');
         $newUnit->addAlias('inches');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Mile
         $newUnit = UnitOfMeasure::linearUnitFactory('mi', 1609.344);
         $newUnit->addAlias('mile');
         $newUnit->addAlias('miles');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Yard
         $newUnit = UnitOfMeasure::linearUnitFactory('yd', 0.9144);
         $newUnit->addAlias('yard');
         $newUnit->addAlias('yards');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
     }
 }

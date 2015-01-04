@@ -1,19 +1,17 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Time extends AbstractBasePhysicalQuantity
+class Time extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // Second
         $second = UnitOfMeasure::nativeUnitFactory('s');
@@ -21,7 +19,7 @@ class Time extends AbstractBasePhysicalQuantity
         $second->addAlias('secs');
         $second->addAlias('second');
         $second->addAlias('seconds');
-        static::registerUnitOfMeasure($second);
+        static::addUnit($second);
 
         static::addMissingSIPrefixedUnits(
             $second,
@@ -41,7 +39,7 @@ class Time extends AbstractBasePhysicalQuantity
         $newUnit->addAlias('mins');
         $newUnit->addAlias('minute');
         $newUnit->addAlias('minutes');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Hours
         $newUnit = UnitOfMeasure::linearUnitFactory('h', 3600);
@@ -49,13 +47,13 @@ class Time extends AbstractBasePhysicalQuantity
         $newUnit->addAlias('hrs');
         $newUnit->addAlias('hour');
         $newUnit->addAlias('hours');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Days
         $newUnit = UnitOfMeasure::linearUnitFactory('d', 86400);
         $newUnit->addAlias('day');
         $newUnit->addAlias('days');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
 
         // Weeks, understood as 7 days
         $newUnit = UnitOfMeasure::linearUnitFactory('w', 604800);
@@ -63,6 +61,6 @@ class Time extends AbstractBasePhysicalQuantity
         $newUnit->addAlias('wks');
         $newUnit->addAlias('week');
         $newUnit->addAlias('weeks');
-        static::registerUnitOfMeasure($newUnit);
+        static::addUnit($newUnit);
     }
 }

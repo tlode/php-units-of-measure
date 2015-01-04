@@ -1,16 +1,14 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Acceleration extends AbstractBasePhysicalQuantity
+class Acceleration extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // meters per second squared
         $meterpersecondsquared = UnitOfMeasure::nativeUnitFactory('m/s^2');
@@ -19,6 +17,6 @@ class Acceleration extends AbstractBasePhysicalQuantity
         $meterpersecondsquared->addAlias('meters per second squared');
         $meterpersecondsquared->addAlias('metre per second squared');
         $meterpersecondsquared->addAlias('metres per second squared');
-        static::registerUnitOfMeasure($meterpersecondsquared);
+        static::addUnit($meterpersecondsquared);
     }
 }

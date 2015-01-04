@@ -1,24 +1,22 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class LuminousIntensity extends AbstractBasePhysicalQuantity
+class LuminousIntensity extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // Candela
         $candela = UnitOfMeasure::nativeUnitFactory('cd');
         $candela->addAlias('candela');
-        static::registerUnitOfMeasure($candela);
+        static::addUnit($candela);
 
         static::addMissingSIPrefixedUnits(
             $candela,

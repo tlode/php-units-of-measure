@@ -1,126 +1,166 @@
 <?php
 namespace PhpUnitsOfMeasure;
 
-abstract class AbstractPhysicalQuantity
+abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
 {
     /**
      * The collection of units of measure in which this quantity can
      * be represented.
      *
-     * @var \PhpUnitsOfMeasure\UnitOfMeasureInterface[]
+     * Note that a null (not an empty array) value indicates that
+     * this class hasn't been initialized yet.
+     *
+     * Finally, note that this property is commented out here to force
+     * an error if a child class does not define it's own static instance
+     * of this property.  This avoids accidental pollution of shared
+     * state between AbstractPhysicalQuantity child classes if an extending class
+     * forgets to define this property.
+     *
+     * TL;DR - child classes must define this property themselves!
+     *
+     * @var UnitOfMeasureInterface[]
      */
-    protected static $unitDefinitions = [];
+    // protected static $unitDefinitions;
 
     /**
-     * Have the default units been configured yet for this quantity?
+     * Register a new unit of measure for this quantity.
      *
-     * @var boolean
+     * The meaning here is to register a new unit of measure to which measurements
+     * of this physical quantity can be converted.  This method is used both when
+     * initalizing a quantity class or later, to add custom units of measure.
+     *
+     * @throws Exception\DuplicateUnitNameOrAlias If the name or any alias already exists
+     *
+     * @param UnitOfMeasureInterface $unit The new unit of measure
      */
-    protected static $hasBeenInitialized = false;
-
-    /**
-     * Register a new Unit of Measure with this quantity.
-     *
-     * The intended use is to register a new unit of measure to which measurements
-     * of this physical quantity can be converted.
-     *
-     * @throws \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias If the name or alias already exists
-     *
-     * @param \PhpUnitsOfMeasure\UnitOfMeasureInterface $unit The new unit of measure
-     */
-    public static function registerUnitOfMeasure(UnitOfMeasureInterface $unit)
+    public static function addUnit(UnitOfMeasureInterface $unit)
     {
         if (static::unitNameOrAliasesAlreadyExist($unit)) {
-            $labels = implode(', ', array_merge([$unit->getName()], $unit->getAliases()));
-            throw new Exception\DuplicateUnitNameOrAlias("The unit has a name or alias ($labels) which is already a registered unit for this quantity");
+            throw new Exception\DuplicateUnitNameOrAlias([
+                ':labels' => implode(', ', [$unit->getName()] + $unit->getAliases())
+            ]);
         }
 
         static::$unitDefinitions[] = $unit;
     }
 
     /**
+     * Get the unit of measure that matches the given name by either name or alias.
+     *
+     * @param string $unit A name or abbreviation by which the unit is known.
+     *
+     * @throws Exception\UnknownUnitOfMeasure when an unknown unit of measure is given
+     *
+     * @return UnitOfMeasureInterface
+     */
+    public static function getUnit($unit)
+    {
+        // If this class hasn't had its default units set, set them now
+        if (!is_array(static::$unitDefinitions)) {
+            static::$unitDefinitions = [];
+            static::initialize();
+        }
+
+        foreach (static::$unitDefinitions as $unitOfMeasure) {
+            if ($unit === $unitOfMeasure->getName() || $unitOfMeasure->isAliasOf($unit)) {
+                return $unitOfMeasure;
+            }
+        }
+
+        throw new Exception\UnknownUnitOfMeasure([':unit' => $unit]);
+    }
+
+    /**
      * Given a unit of measure, determine if its name or any of its aliases conflict
      * with the set of already-known unit names and aliases.
      *
-     * @param  UnitOfMeasureInterface $unit The unit in question
+     * @param UnitOfMeasureInterface $unit The unit in question
      *
      * @return boolean true if there is a conflict, false if there is not
      */
     protected static function unitNameOrAliasesAlreadyExist(UnitOfMeasureInterface $unit)
     {
         // If this class hasn't had its default units set, set them now
-        if (!static::$hasBeenInitialized) {
-            static::$hasBeenInitialized = true;
-            static::initializeUnitsOfMeasure();
-        }
-        $unitDefinitions = static::$unitDefinitions;
-
-        $currentUnits = [];
-        foreach ($unitDefinitions as $unitOfMeasure) {
-            $currentUnits[] = $unitOfMeasure->getName();
-            foreach ($unitOfMeasure->getAliases() as $alias) {
-                $currentUnits[] = $alias;
-            }
+        if (!is_array(static::$unitDefinitions)) {
+            static::$unitDefinitions = [];
+            static::initialize();
         }
 
-        $newUnitName = $unit->getName();
-        if (in_array($newUnitName, $currentUnits)) {
-            return true;
+        $currentUnitNamesAndAliases = [];
+        foreach (static::$unitDefinitions as $unitOfMeasure) {
+            $currentUnitNamesAndAliases[] = $unitOfMeasure->getName();
+            $currentUnitNamesAndAliases += $unitOfMeasure->getAliases();
         }
 
-        $newAliases = $unit->getAliases();
-        foreach ($newAliases as $newUnitAlias) {
-            if (in_array($newUnitAlias, $currentUnits)) {
+        $newUnitNamesAndAliases = [$unit->getName()] + $unit->getAliases();
+        foreach ($newUnitNamesAndAliases as $newUnitName) {
+            if (in_array($newUnitName, $currentUnitNamesAndAliases)) {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Get the unit definition that matches the given unit of measure name.
-     *
-     * Note that this can match either the index or the aliases.
-     *
-     * @param  string $unit The starting unit of measure
-     *
-     * @throws \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure when an unknown unit of measure is given
-     *
-     * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface
+     * Initialize the static properties of this quantity class, such as the set of
+     * default units of measure.
      */
-    protected static function findUnitOfMeasureByNameOrAlias($unit)
-    {
-        // If this class hasn't had its default units set, set them now
-        if (!static::$hasBeenInitialized) {
-            static::$hasBeenInitialized = true;
-            static::initializeUnitsOfMeasure();
-        }
-        $unitDefinitions = static::$unitDefinitions;
+    abstract protected static function initialize();
 
-        foreach ($unitDefinitions as $unitOfMeasure) {
-            if ($unit === $unitOfMeasure->getName() || $unitOfMeasure->isAliasOf($unit)) {
-                return $unitOfMeasure;
-            }
-        }
-
-        throw new Exception\UnknownUnitOfMeasure("Unknown unit of measure ($unit)");
-    }
 
     /**
-     * Initialize the set of default units of measure for this quantity.
+     * The scalar value, in the original unit of measure.
      *
-     * This should include any generally used units of measure through
-     * static::registerUnitOfMeasure().
+     * @var float
      */
-    abstract protected static function initializeUnitsOfMeasure();
+    protected $originalValue;
 
+    /**
+     * The original unit of measure's string representation.
+     *
+     * @var string
+     */
+    protected $originalUnit;
+
+    /**
+     * Store the value and its original unit.
+     *
+     * @param float  $value The scalar value of the measurement
+     * @param string $unit  The unit of measure in which this value is provided
+     *
+     * @throws Exception\NonNumericValue If the value is not numeric
+     * @throws Exception\NonStringUnitName If the unit is not a string
+     */
+    public function __construct($value, $unit)
+    {
+        if (!is_numeric($value)) {
+            throw new Exception\NonNumericValue([':value' => $value]);
+        }
+
+        if (!is_string($unit)) {
+            throw new Exception\NonStringUnitName([':name' => $unit]);
+        }
+
+        $this->originalValue = $value;
+        $this->originalUnit  = $unit;
+    }
 
     /**
      * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toUnit
      */
     public function toUnit($toUnit)
     {
-        return $this->toUnitOfMeasure(static::findUnitOfMeasureByNameOrAlias($toUnit));
+        return $this->toUnitOfMeasure(static::getUnit($toUnit));
+    }
+
+    /**
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toNativeUnit
+     */
+    public function toNativeUnit()
+    {
+        return $this->getOriginalUnit()
+            ->convertValueToNativeUnitOfMeasure($this->originalValue);
     }
 
     /**
@@ -136,15 +176,13 @@ abstract class AbstractPhysicalQuantity
     }
 
     /**
-     * Fetch the measurement in the quantity's native unit of measure
+     * Get this quantity's original units of measure.
      *
-     * @return float the measurement cast to the native unit of measurement
+     * @return UnitOfMeasureInterface
      */
-    protected function toNativeUnit()
+    private function getOriginalUnit()
     {
-        return $this
-            ->getOriginalUnit()
-            ->convertValueToNativeUnitOfMeasure($this->getOriginalValue());
+        return static::getUnit($this->originalUnit);
     }
 
     /**
@@ -152,7 +190,7 @@ abstract class AbstractPhysicalQuantity
      */
     public function __toString()
     {
-        return $this->getOriginalValue() . ' ' . $this->getOriginalUnit()->getName();
+        return trim($this->originalValue . ' ' . $this->getOriginalUnit()->getName());
     }
 
     /**
@@ -160,15 +198,15 @@ abstract class AbstractPhysicalQuantity
      */
     public function add(PhysicalQuantityInterface $quantity)
     {
-        if (!$this->isSameQuantity($quantity, $this)) {
-            throw new Exception\PhysicalQuantityMismatch(
-                'Cannot add type ('.get_class($quantity).') to type ('.get_class($this).') because the units do not match.'
-            );
+        if (!$this->isEquivalentQuantity($quantity)) {
+            throw new Exception\PhysicalQuantityMismatch([
+                ':lhs' => (string) $this,
+                ':rhs' => (string) $quantity
+            ]);
         }
 
-        $newValue = $this->getOriginalValue() + $quantity->toUnitOfMeasure($this->getOriginalUnit());
+        $newValue = $this->originalValue + $quantity->toUnitOfMeasure($this->getOriginalUnit());
 
-        // TODO not sure this is how derived quantities are going to instantiate
         return new static($newValue, $this->getOriginalUnit()->getName());
     }
 
@@ -177,16 +215,24 @@ abstract class AbstractPhysicalQuantity
      */
     public function subtract(PhysicalQuantityInterface $quantity)
     {
-        if (!$this->isSameQuantity($quantity, $this)) {
-            throw new Exception\PhysicalQuantityMismatch(
-                'Cannot subtract type ('.get_class($quantity).') from type ('.get_class($this).') because the units do not match.'
-            );
+        if (!$this->isEquivalentQuantity($quantity)) {
+            throw new Exception\PhysicalQuantityMismatch([
+                ':lhs' => (string) $this,
+                ':rhs' => (string) $quantity
+            ]);
         }
 
-        $newValue = $this->getOriginalValue() - $quantity->toUnitOfMeasure($this->getOriginalUnit());
+        $newValue = $this->originalValue - $quantity->toUnitOfMeasure($this->getOriginalUnit());
 
-        // TODO not sure this is how derived quantities are going to instantiate
         return new static($newValue, $this->getOriginalUnit()->getName());
+    }
+
+    /**
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::isEquivalentQuantity
+     */
+    public function isEquivalentQuantity(PhysicalQuantityInterface $testQuantity)
+    {
+        return get_class($this) === get_class($testQuantity);
     }
 
     /**
@@ -194,7 +240,7 @@ abstract class AbstractPhysicalQuantity
      */
     public function multiplyBy(PhysicalQuantityInterface $quantity)
     {
-        return AbstractDerivedPhysicalQuantity::factory([$this, $quantity], []);
+        return DerivedPhysicalQuantityFactory::factory([$this, $quantity], []);
     }
 
     /**
@@ -202,33 +248,6 @@ abstract class AbstractPhysicalQuantity
      */
     public function divideBy(PhysicalQuantityInterface $quantity)
     {
-        return AbstractDerivedPhysicalQuantity::factory([$this], [$quantity]);
+        return DerivedPhysicalQuantityFactory::factory([$this], [$quantity]);
     }
-
-    /**
-     * Get this quantity's value, in the original units of measure.
-     *
-     * @return float
-     */
-    abstract protected function getOriginalValue();
-
-    /**
-     * Get this quantity's original units of measure.
-     *
-     * @return \PhpUnitsOfMeasure\UnitOfMeasureInterface
-     */
-    abstract protected function getOriginalUnit();
-
-    /**
-     * Determine whether two given PhysicalQuantityInterface objects represent the same
-     * physical quantity.
-     *
-     * Note this is not considering magnitude.
-     *
-     * @param PhysicalQuantityInterface $firstQuantity
-     * @param PhysicalQuantityInterface $secondQuantity
-     *
-     * @return boolean True if the quantities are the same, false if not.
-     */
-    abstract protected function isSameQuantity(PhysicalQuantityInterface $firstQuantity, PhysicalQuantityInterface $secondQuantity);
 }

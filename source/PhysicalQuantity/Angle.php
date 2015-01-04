@@ -1,25 +1,23 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Angle extends AbstractBasePhysicalQuantity
+class Angle extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // Radians
         $radian = UnitOfMeasure::nativeUnitFactory('rad');
         $radian->addAlias('radian');
         $radian->addAlias('radians');
-        static::registerUnitOfMeasure($radian);
+        static::addUnit($radian);
 
         static::addMissingSIPrefixedUnits(
             $radian,
@@ -36,7 +34,7 @@ class Angle extends AbstractBasePhysicalQuantity
         $degree->addAlias('°');
         $degree->addAlias('degree');
         $degree->addAlias('degrees');
-        static::registerUnitOfMeasure($degree);
+        static::addUnit($degree);
 
         static::addMissingSIPrefixedUnits(
             $degree,
@@ -56,7 +54,7 @@ class Angle extends AbstractBasePhysicalQuantity
         $arcminute->addAlias('amin');
         $arcminute->addAlias('am');
         $arcminute->addAlias('MOA');
-        static::registerUnitOfMeasure($arcminute);
+        static::addUnit($arcminute);
 
         // Arcsecond
         $arcsecond = UnitOfMeasure::linearUnitFactory('arcsec', M_PI / 180 / 3600);
@@ -65,7 +63,7 @@ class Angle extends AbstractBasePhysicalQuantity
         $arcminute->addAlias('arcseconds');
         $arcsecond->addAlias('asec');
         $arcsecond->addAlias('as');
-        static::registerUnitOfMeasure($arcsecond);
+        static::addUnit($arcsecond);
 
         static::addMissingSIPrefixedUnits(
             $arcsecond,

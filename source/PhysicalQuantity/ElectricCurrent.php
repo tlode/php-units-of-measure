@@ -1,19 +1,17 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class ElectricCurrent extends AbstractBasePhysicalQuantity
+class ElectricCurrent extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         // Ampere
         $ampere = UnitOfMeasure::nativeUnitFactory('A');
@@ -21,7 +19,7 @@ class ElectricCurrent extends AbstractBasePhysicalQuantity
         $ampere->addAlias('amps');
         $ampere->addAlias('ampere');
         $ampere->addAlias('amperes');
-        static::registerUnitOfMeasure($ampere);
+        static::addUnit($ampere);
 
         static::addMissingSIPrefixedUnits(
             $ampere,

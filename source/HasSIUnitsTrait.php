@@ -188,7 +188,7 @@ trait HasSIUnitsTrait
 
             // If the unit doesn't conflict with any of the already-existing units, register it
             if (!static::unitNameOrAliasesAlreadyExist($newUnit)) {
-                static::registerUnitOfMeasure($newUnit);
+                static::addUnit($newUnit);
             }
         }
     }

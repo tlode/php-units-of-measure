@@ -2,6 +2,7 @@
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
 use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
+use PhpUnitsOfMeasure\PhysicalQuantityInterface;
 
 /**
  * This is a special case of AbstractDerivedPhysicalQuantity, and
@@ -11,13 +12,23 @@ use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
  */
 class UnknownDerivedPhysicalQuantity extends AbstractDerivedPhysicalQuantity
 {
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
-        // $coefficient = UnitOfMeasure::nativeUnitFactory('');
-        // static::registerUnitOfMeasure($coefficient);
+    }
+
+    /**
+     * Unknown quantities are a special case, in that its possible for two objects
+     * of this type to represent two different physical quantities.  Therefore, the
+     * check for quantity equivalency needs to be more stringent and actually compare
+     * the component units.
+     *
+     * @see \PhpUnitsOfMeasure\AbstractPhysicalQuantity::isEquivalentQuantity
+     */
+    public function isEquivalentQuantity(PhysicalQuantityInterface $testQuantity)
+    {
+        // @TODO fix this so it checks quantities for equivalency
+        return false;
     }
 }

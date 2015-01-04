@@ -5,7 +5,7 @@ namespace PhpUnitsOfMeasureTest;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
 
-class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
+class AbstractPhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
 {
     protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity';
     protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity';
@@ -41,35 +41,13 @@ class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
         ];
     }
 
-    // public function validUnitsProvider()
-    // {
-    //     return [
-    //         [
-    //             $withAliases = false,
-    //             [
-    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-    //             ],
-    //             ['l', 'p', 'quatloos', 'schmoos'],
-    //         ],
-    //         [
-    //             $withAliases = true,
-    //             [
-    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-    //             ],
-    //             ['l', 'lupee', 'lupees', 'p', 'plurp', 'plurps', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-    //         ]
-    //     ];
-    // }
-
     public function quantityConversionsProvider()
     {
         return [
-            [new Woogosity(2, 'l'), 2, 'l', 2],
-            [new Woogosity(2, 'l'), 2, 'plurp', 2/1.234],
-            [new Woogosity(2, 'plurp'), 2*1.234, 'l', 2*1.234],
-            [new Woogosity(2, 'plurp'), 2*1.234, 'plurp', 2.0]
+            [new Woogosity(2, 'l'), 'l', 2],
+            [new Woogosity(2, 'l'), 'plurp', 2/1.234],
+            [new Woogosity(2, 'plurp'), 'l', 2*1.234],
+            [new Woogosity(2, 'plurp'), 'plurp', 2.0]
         ];
     }
 
@@ -110,7 +88,7 @@ class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
     // ************************************************************************
 
     /**
-     * @covers \PhpUnitsOfMeasure\AbstractBasePhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__construct
      */
     public function testInstantiateNewUnit()
     {
@@ -118,7 +96,7 @@ class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\AbstractBasePhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__construct
      * @expectedException \PhpUnitsOfMeasure\Exception\NonNumericValue
      */
     public function testInstantiateNewUnitNonNumericValue()
@@ -127,7 +105,7 @@ class AbstractBasePhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\AbstractBasePhysicalQuantity::__construct
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__construct
      * @expectedException \PhpUnitsOfMeasure\Exception\NonStringUnitName
      */
     public function testInstantiateNewUnitNonStringUnit()

@@ -1,26 +1,33 @@
 <?php
 namespace PhpUnitsOfMeasure\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
 /**
  * Objects of this type represent a special dimensionless
- * quantity.  It's used, for instance, as a placeholder when
- * cancelling values in derived quantities.
+ * quantity.  It's used, as a coefficient placeholder when cancelling
+ * values in derived quantities.  It would also be the
+ * resulting type of division operation in which all units cancel,
+ * for instance, Length / Length.
  */
-class DimensionlessCoefficient extends AbstractBasePhysicalQuantity
+class DimensionlessCoefficient extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
         $coefficient = UnitOfMeasure::nativeUnitFactory('');
-        static::registerUnitOfMeasure($coefficient);
+        static::addUnit($coefficient);
     }
 
+    /**
+     * This class has a unique constructor, in that there
+     * is never a unit name specified.  Dimensionless coefficients
+     * only have a scalar value.
+     *
+     * @param float $value The dimensionless scalar value.
+     */
     public function __construct($value)
     {
         parent::__construct($value, '');

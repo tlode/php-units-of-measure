@@ -9,38 +9,6 @@ namespace PhpUnitsOfMeasure;
 class UnitOfMeasure implements UnitOfMeasureInterface
 {
     /**
-     * The canonical name for this unit of measure.
-     *
-     * Typically this is the official way the unit is abbreviated.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * A collection of alias names that map to this unit of measure
-     *
-     * @var string[]
-     */
-    protected $aliases = [];
-
-    /**
-     * A callable that can convert a value in this quantity's
-     * native unit to this unit of measure.
-     *
-     * @var callable
-     */
-    protected $fromNativeUnit;
-
-    /**
-     * A callable that can convert a value in this unit of measure
-     * to a value in the native unit of the physical quantity.
-     *
-     * @var callable
-     */
-    protected $toNativeUnit;
-
-    /**
      * For the special case of units that have a linear conversion factor, this factory
      * method simplifies the construction of the unit of measure.
      *
@@ -85,6 +53,38 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     }
 
     /**
+     * The canonical name for this unit of measure.
+     *
+     * Typically this is the official way the unit is abbreviated.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * A collection of alias names that map to this unit of measure
+     *
+     * @var string[]
+     */
+    protected $aliases = [];
+
+    /**
+     * A callable that can convert a value in this quantity's
+     * native unit to this unit of measure.
+     *
+     * @var callable
+     */
+    protected $fromNativeUnit;
+
+    /**
+     * A callable that can convert a value in this unit of measure
+     * to a value in the native unit of the physical quantity.
+     *
+     * @var callable
+     */
+    protected $toNativeUnit;
+
+    /**
      * Configure this object's mandatory properties.
      *
      * @param string   $name           This unit of measure's canonical name
@@ -94,7 +94,7 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     public function __construct($name, callable $fromNativeUnit, callable $toNativeUnit)
     {
         if (!is_string($name)) {
-            throw new Exception\NonStringUnitName("Alias ($name) must be a string value.");
+            throw new Exception\NonStringUnitName([':name' => $name]);
         }
 
         $this->name           = $name;
@@ -116,7 +116,7 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     public function addAlias($alias)
     {
         if (!is_string($alias)) {
-            throw new Exception\NonStringUnitName("Alias ($alias) must be a string value.");
+            throw new Exception\NonStringUnitName([':name' => $alias]);
         }
 
         $this->aliases[] = $alias;
@@ -136,7 +136,7 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     public function isAliasOf($unit)
     {
         if (!is_string($unit)) {
-            throw new Exception\NonStringUnitName("Alias ($unit) must be a string value.");
+            throw new Exception\NonStringUnitName([':name' => $unit]);
         }
 
         return in_array($unit, $this->aliases);
@@ -148,7 +148,7 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     public function convertValueFromNativeUnitOfMeasure($value)
     {
         if (!is_numeric($value)) {
-            throw new Exception\NonNumericValue("Value ($value) must be numeric.");
+            throw new Exception\NonNumericValue([':value' => $value]);
         }
 
         $callable = $this->fromNativeUnit;
@@ -161,7 +161,7 @@ class UnitOfMeasure implements UnitOfMeasureInterface
     public function convertValueToNativeUnitOfMeasure($value)
     {
         if (!is_numeric($value)) {
-            throw new Exception\NonNumericValue("Value ($value) must be numeric.");
+            throw new Exception\NonNumericValue([':value' => $value]);
         }
 
         $callable = $this->toNativeUnit;

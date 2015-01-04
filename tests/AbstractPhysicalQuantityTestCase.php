@@ -17,7 +17,7 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
 
     /**
      * Running this before every test will clear out the static initalization
-     * of an AbstractPhysicalQuantity class.
+     * of all the AbstractPhysicalQuantity test classes.
      */
     public function resetStaticProperty()
     {
@@ -53,7 +53,7 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
     public function testRegisterUnitFailsOnNameCollision($newUnit)
     {
         $firstTestClass = $this->firstTestClass;
-        $firstTestClass::registerUnitOfMeasure($newUnit);
+        $firstTestClass::addUnit($newUnit);
     }
 
     /**
@@ -62,7 +62,6 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
      */
     public function testUnitConvertsToArbitraryUnit(
         AbstractPhysicalQuantity $value,
-        $valueInNativeUnit,
         $arbitraryUnit,
         $valueInArbitraryUnit
     ) {
@@ -76,7 +75,6 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
      */
     public function testConvertToUnknownUnitThrowsException(
         AbstractPhysicalQuantity $value,
-        $valueInNativeUnit,
         $arbitraryUnit,
         $valueInArbitraryUnit
     ) {
@@ -136,10 +134,10 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
         }
     }
 
-    /**
-     * @dataProvider productProvider
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
-     */
+    // /**
+    //  * @dataProvider productProvider
+    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
+    //  */
     // public function testMultiplyBy(
     //     AbstractPhysicalQuantity $firstValue,
     //     AbstractPhysicalQuantity $secondValue,
@@ -154,10 +152,10 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
     //     $this->assertSame($productString, (string) $product);
     // }
 
-    // *
+    // /**
     //  * @dataProvider productProvider
     //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
-
+    //  */
     // public function testDivideBy(
     //     AbstractPhysicalQuantity $firstValue,
     //     AbstractPhysicalQuantity $secondValue,
@@ -173,8 +171,6 @@ abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCa
     // }
 
     abstract public function exceptionProducingUnitsProvider();
-
-    // abstract public function validUnitsProvider();
 
     abstract public function quantityConversionsProvider();
 
