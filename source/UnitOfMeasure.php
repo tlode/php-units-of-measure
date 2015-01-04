@@ -1,11 +1,6 @@
 <?php
 namespace PhpUnitsOfMeasure;
 
-/**
- * This implementation of UnitOfMeasureInterface uses
- * a pair of anonymous functions to cast values to and from
- * the native unit of measure, respectively.
- */
 class UnitOfMeasure implements UnitOfMeasureInterface
 {
     /**

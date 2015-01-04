@@ -4,38 +4,24 @@ namespace PhpUnitsOfMeasure;
 abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
 {
     /**
-     * The collection of units of measure in which this quantity can
-     * be represented.
+     * The collection of units in which this quantity can be represented.
      *
-     * Note that a null (not an empty array) value indicates that
-     * this class hasn't been initialized yet.
-     *
-     * Finally, note that this property is commented out here to force
-     * an error if a child class does not define it's own static instance
-     * of this property.  This avoids accidental pollution of shared
-     * state between AbstractPhysicalQuantity child classes if an extending class
-     * forgets to define this property.
-     *
-     * TL;DR - child classes must define this property themselves!
+     * Commented out to ensure that each child class defines its own instance of this static.
      *
      * @var UnitOfMeasureInterface[]
      */
     // protected static $unitDefinitions;
 
     /**
-     * Register a new unit of measure for this quantity.
+     * Register a new unit of measure for all instances of this this physical quantity.
      *
-     * The meaning here is to register a new unit of measure to which measurements
-     * of this physical quantity can be converted.  This method is used both when
-     * initalizing a quantity class or later, to add custom units of measure.
-     *
-     * @throws Exception\DuplicateUnitNameOrAlias If the name or any alias already exists
+     * @throws Exception\DuplicateUnitNameOrAlias If the unit name or any alias already exists
      *
      * @param UnitOfMeasureInterface $unit The new unit of measure
      */
     public static function addUnit(UnitOfMeasureInterface $unit)
     {
-        if (static::unitNameOrAliasesAlreadyExist($unit)) {
+        if (static::unitNameOrAliasesAlreadyRegistered($unit)) {
             throw new Exception\DuplicateUnitNameOrAlias([
                 ':labels' => implode(', ', [$unit->getName()] + $unit->getAliases())
             ]);
@@ -47,7 +33,7 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
     /**
      * Get the unit of measure that matches the given name by either name or alias.
      *
-     * @param string $unit A name or abbreviation by which the unit is known.
+     * @param string $unit A name or alias by which the unit is known.
      *
      * @throws Exception\UnknownUnitOfMeasure when an unknown unit of measure is given
      *
@@ -55,7 +41,7 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
      */
     public static function getUnit($unit)
     {
-        // If this class hasn't had its default units set, set them now
+        // If this class hasn't been initalized yet, do so now
         if (!is_array(static::$unitDefinitions)) {
             static::$unitDefinitions = [];
             static::initialize();
@@ -78,13 +64,15 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
      *
      * @return boolean true if there is a conflict, false if there is not
      */
-    protected static function unitNameOrAliasesAlreadyExist(UnitOfMeasureInterface $unit)
+    protected static function unitNameOrAliasesAlreadyRegistered(UnitOfMeasureInterface $unit)
     {
-        // If this class hasn't had its default units set, set them now
+        // If this class hasn't been initalized yet, do so now
         if (!is_array(static::$unitDefinitions)) {
             static::$unitDefinitions = [];
             static::initialize();
         }
+
+        $newUnitNamesAndAliases = [$unit->getName()] + $unit->getAliases();
 
         $currentUnitNamesAndAliases = [];
         foreach (static::$unitDefinitions as $unitOfMeasure) {
@@ -92,14 +80,7 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
             $currentUnitNamesAndAliases += $unitOfMeasure->getAliases();
         }
 
-        $newUnitNamesAndAliases = [$unit->getName()] + $unit->getAliases();
-        foreach ($newUnitNamesAndAliases as $newUnitName) {
-            if (in_array($newUnitName, $currentUnitNamesAndAliases)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_intersect($newUnitNamesAndAliases, $currentUnitNamesAndAliases) !== [];
     }
 
     /**
@@ -155,15 +136,6 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
     }
 
     /**
-     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toNativeUnit
-     */
-    public function toNativeUnit()
-    {
-        return $this->getOriginalUnit()
-            ->convertValueToNativeUnitOfMeasure($this->originalValue);
-    }
-
-    /**
      * Convert this quantity to the given unit of measure.
      *
      * @param UnitOfMeasureInterface $unit The object representing the target unit of measure.
@@ -172,17 +144,17 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
      */
     private function toUnitOfMeasure(UnitOfMeasureInterface $unit)
     {
-        return $unit->convertValueFromNativeUnitOfMeasure($this->toNativeUnit());
+        $thisValueInNativeUnit = $this->toNativeUnit();
+        return $unit->convertValueFromNativeUnitOfMeasure($thisValueInNativeUnit);
     }
 
     /**
-     * Get this quantity's original units of measure.
-     *
-     * @return UnitOfMeasureInterface
+     * @see \PhpUnitsOfMeasure\PhysicalQuantityInterface::toNativeUnit
      */
-    private function getOriginalUnit()
+    public function toNativeUnit()
     {
-        return static::getUnit($this->originalUnit);
+        return static::getUnit($this->originalUnit)
+            ->convertValueToNativeUnitOfMeasure($this->originalValue);
     }
 
     /**
@@ -190,7 +162,7 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
      */
     public function __toString()
     {
-        return trim($this->originalValue . ' ' . $this->getOriginalUnit()->getName());
+        return trim($this->originalValue . ' ' . static::getUnit($this->originalUnit)->getName());
     }
 
     /**
@@ -205,9 +177,10 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
             ]);
         }
 
-        $newValue = $this->originalValue + $quantity->toUnitOfMeasure($this->getOriginalUnit());
+        $quantityValueInThisOriginalUnit = $quantity->toUnitOfMeasure(static::getUnit($this->originalUnit));
+        $newValue = $this->originalValue + $quantityValueInThisOriginalUnit;
 
-        return new static($newValue, $this->getOriginalUnit()->getName());
+        return new static($newValue, static::getUnit($this->originalUnit)->getName());
     }
 
     /**
@@ -222,9 +195,10 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
             ]);
         }
 
-        $newValue = $this->originalValue - $quantity->toUnitOfMeasure($this->getOriginalUnit());
+        $quantityValueInThisOriginalUnit = $quantity->toUnitOfMeasure(static::getUnit($this->originalUnit));
+        $newValue = $this->originalValue - $quantityValueInThisOriginalUnit;
 
-        return new static($newValue, $this->getOriginalUnit()->getName());
+        return new static($newValue, static::getUnit($this->originalUnit)->getName());
     }
 
     /**
