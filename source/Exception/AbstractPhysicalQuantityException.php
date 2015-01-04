@@ -20,7 +20,7 @@ abstract class AbstractPhysicalQuantityException extends Exception
      */
     public function __construct(array $parameters = [])
     {
-        $message = strtr($error, $parameters);
+        $message = strtr($this->error, $parameters);
         parent::__construct($message);
     }
 }
