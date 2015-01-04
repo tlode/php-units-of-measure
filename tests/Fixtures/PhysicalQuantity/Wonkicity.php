@@ -2,23 +2,23 @@
 
 namespace PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Wonkicity extends AbstractBasePhysicalQuantity
+class Wonkicity extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions    = [];
-    protected static $hasBeenInitialized = false;
-    protected static function initializeUnitsOfMeasure()
+    protected static $unitDefinitions;
+
+    protected static function initialize()
     {
         $native = UnitOfMeasure::nativeUnitFactory('u');
         $native->addAlias('uvee');
         $native->addAlias('uvees');
-        static::registerUnitOfMeasure($native);
+        static::addUnit($native);
 
-        $unit = UnitOfMeasure::linearUnitFactory('v', 3.456);
+        $unit = UnitOfMeasure::linearUnitFactory('v', 3.5);
         $unit->addAlias('vorp');
         $unit->addAlias('vorps');
-        static::registerUnitOfMeasure($unit);
+        static::addUnit($unit);
     }
 }

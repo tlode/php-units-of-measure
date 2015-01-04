@@ -2,23 +2,23 @@
 
 namespace PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity;
 
-use PhpUnitsOfMeasure\AbstractBasePhysicalQuantity;
+use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Wigginess extends AbstractBasePhysicalQuantity
+class Wigginess extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions    = [];
-    protected static $hasBeenInitialized = false;
-    protected static function initializeUnitsOfMeasure()
+    protected static $unitDefinitions;
+
+    protected static function initialize()
     {
         $native = UnitOfMeasure::nativeUnitFactory('s');
         $native->addAlias('sopee');
         $native->addAlias('sopees');
-        static::registerUnitOfMeasure($native);
+        static::addUnit($native);
 
-        $unit = UnitOfMeasure::linearUnitFactory('t', 2.345);
+        $unit = UnitOfMeasure::linearUnitFactory('t', 2.5);
         $unit->addAlias('tumpet');
         $unit->addAlias('tumpets');
-        static::registerUnitOfMeasure($unit);
+        static::addUnit($unit);
     }
 }

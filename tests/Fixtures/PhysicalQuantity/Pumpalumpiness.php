@@ -2,41 +2,48 @@
 namespace PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity;
 
 use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
-use PhpUnitsOfMeasure\CompoundUnitOfMeasure;
+use PhpUnitsOfMeasure\DerivedUnitOfMeasure;
+use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
 class Pumpalumpiness extends AbstractDerivedPhysicalQuantity
 {
-    protected static $componentQuantities = [
-        ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess'],
-        ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity', 'PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity']
-    ];
+    use HasSIUnitsTrait;
 
-    protected static $unitDefinitions = [];
+    protected static $unitDefinitions;
+    protected static $componentQuantities;
 
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
-        $native = new CompoundUnitOfMeasure(
+        static::setComponentQuantities(
+            [Woogosity::class, Wigginess::class, Wigginess::class],
+            [Wonkicity::class, Wonkicity::class]
+        );
+
+        $native = new DerivedUnitOfMeasure(
             'fl',
-            [
-                ['l', 's', 's'],
-                ['v', 'vorp'],
-            ]
+            [Woogosity::getUnit('l'), Wigginess::getUnit('s'), Wigginess::getUnit('s')],
+            [Wonkicity::getUnit('v'), Wonkicity::getUnit('vorp')]
         );
         $native->addAlias('floop');
         $native->addAlias('floops');
-        static::registerUnitOfMeasure($native);
-
-        $unit = new CompoundUnitOfMeasure(
-            'gl',
+        static::addUnit($native);
+        static::addMissingSIPrefixedUnits(
+            $native,
+            1,
+            '%pfl',
             [
-                ['p', 't', 't'],
-                ['u', 'uvees'],
+                '%Pfloop',
+                '%Pfloops',
             ]
+        );
+
+        $unit = new DerivedUnitOfMeasure(
+            'gl',
+            [Woogosity::getUnit('p'), Wigginess::getUnit('t'), Wigginess::getUnit('t')],
+            [Wonkicity::getUnit('u'), Wonkicity::getUnit('uvees')]
         );
         $unit->addAlias('glerg');
         $unit->addAlias('glergs');
-        static::registerUnitOfMeasure($unit);
+        static::addUnit($unit);
     }
 }

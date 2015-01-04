@@ -117,7 +117,7 @@ $cubit->addAlias('cubit');
 $cubit->addAlias('cubits');
 
 // Register the new unit of measure with the quantity object
-$length->registerUnitOfMeasure($cubit);
+$length->addUnit($cubit);
 
 // Now that the unit is registered, you can cast the measurement to any other measure of length
 echo $length->toUnit('feet'); // '21'
@@ -130,7 +130,7 @@ Note that when creating instances of `UnitOfMeasure`, there are a couple of conv
 $megameter = UnitOfMeasure::linearUnitFactory('Mm', 1e6);
 $megameter->addAlias('Megameter');
 $megameter->addAlias('Megametre');
-$length->registerUnitOfMeasure($megameter);
+$length->addUnit($megameter);
 ```
 
 The other convenience method is a special case of the above scaling factor factory method where the scaling factor is set to exactly 1, and serves as a convenient way of generating the native unit of measure.  All classes which implement `PhysicalQuantityInterface` must have one and only one native unit, so this method will probably only be called once per class:
@@ -139,7 +139,7 @@ The other convenience method is a special case of the above scaling factor facto
 $meter = UnitOfMeasure::nativeUnitFactory('m');
 $meter->addAlias('meter');
 $meter->addAlias('metre');
-$length->registerUnitOfMeasure($meter);
+$length->addUnit($meter);
 ```
 
 ##### Automatically Generating Metric Units
@@ -152,7 +152,7 @@ use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 use PhpUnitsOfMeasure\HasSIUnitsTrait;
 
-class Mass extends AbstractBasePhysicalQuantity
+class Mass extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
@@ -163,7 +163,7 @@ class Mass extends AbstractBasePhysicalQuantity
         $kilogram = UnitOfMeasure::nativeUnitFactory('kg');
         $kilogram->addAlias('kilogram');
         $kilogram->addAlias('kilograms');
-        $this->registerUnitOfMeasure($kilogram);
+        $this->addUnit($kilogram);
 
         $this->addMissingSIPrefixedUnits(
             $kilogram,
@@ -195,7 +195,7 @@ namespace PhpUnitsOfMeasure\PhysicalQuantity;
 use PhpUnitsOfMeasure\AbstractPhysicalQuantity;
 use PhpUnitsOfMeasure\UnitOfMeasure;
 
-class Length extends AbstractBasePhysicalQuantity
+class Length extends AbstractPhysicalQuantity
 {
     public function __construct($value, $unit)
     {
@@ -211,7 +211,7 @@ class Length extends AbstractBasePhysicalQuantity
         $cubit = UnitOfMeasure::linearUnitFactory('cb', 0.4572);
         $cubit->addAlias('cubit');
         $cubit->addAlias('cubits');
-        $this->registerUnitOfMeasure($cubit);
+        $this->addUnit($cubit);
     }
 }
 ```

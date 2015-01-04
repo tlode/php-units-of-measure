@@ -45,54 +45,31 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
         ];
     }
 
-    // public function validUnitsProvider()
-    // {
-    //     return [
-    //         [
-    //             $withAliases = false,
-    //             [
-    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-    //             ],
-    //             ['fl', 'gl', 'quatloos', 'schmoos'],
-    //         ],
-    //         [
-    //             $withAliases = true,
-    //             [
-    //                 $this->getTestUnitOfMeasure('quatloos', ['qa', 'qs']),
-    //                 $this->getTestUnitOfMeasure('schmoos', ['sc', 'sm'])
-    //             ],
-    //             ['fl', 'floop', 'floops', 'gl', 'glerg', 'glergs', 'quatloos', 'qa', 'qs', 'schmoos', 'sc', 'sm'],
-    //         ]
-    //     ];
-    // }
-
-    // @TODO these providers need to be swapped over to a derivedclass test
     public function quantityConversionsProvider()
     {
         return [
-            [new Woogosity(2, 'l'), 2, 'l', 2],
-            [new Woogosity(2, 'l'), 2, 'plurp', 2/1.234],
-            [new Woogosity(2, 'plurp'), 2*1.234, 'l', 2*1.234],
-            [new Woogosity(2, 'plurp'), 2*1.234, 'plurp', 2.0]
+            [new Pumpalumpiness(2, 'fl'), 'fl', 2],
+            [new Pumpalumpiness(2, 'fl'), 'gl', 2/1.234],
+            [new Pumpalumpiness(2, 'gl'), 'fl', 2*1.234],
+            [new Pumpalumpiness(2, 'gl'), 'gl', 2.0]
         ];
     }
 
     public function toStringProvider()
     {
         return [
-            [new Woogosity(2, 'l'), '2 l'],
-            [new Woogosity(2, 'lupee'), '2 l'],
-            [new Woogosity(2, 'p'), '2 p'],
-            [new Woogosity(2, 'plurp'), '2 p'],
+            [new Pumpalumpiness(2, 'fl'), '2 fl'],
+            [new Pumpalumpiness(2, 'floops'), '2 fl'],
+            [new Pumpalumpiness(2, 'gl'), '2 gl'],
+            [new Pumpalumpiness(2, 'glerg'), '2 gl'],
         ];
     }
 
     public function arithmeticProvider()
     {
         return [
-            [false, new Woogosity(2, 'l'), new Woogosity(2.5, 'l'), '4.5 l', '-0.5 l'],
-            [true,  new Woogosity(2, 'l'), new Wonkicity(2, 'u'), '', ''],
+            [false, new Pumpalumpiness(2, 'fl'), new Pumpalumpiness(2.5, 'fl'), '4.5 l', '-0.5 l'],
+            [true,  new Pumpalumpiness(2, 'fl'), new Plooposity(2, 'ho'), '', ''],
         ];
     }
 
@@ -100,8 +77,8 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     {
         return [
             [
-                new Woogosity(2, 'l'),
-                new Woogosity(4, 'l'),
+                new Pumpalumpiness(2, 'l'),
+                new Pumpalumpiness(4, 'l'),
                 '8 l^2',
                 '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity',
                 '0.5',
@@ -115,11 +92,12 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     // ************************************************************************
 
     // /**
+    // get component factors was made private
     //  * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::factory
     //  */
     // public function testFactorCompositionFromBaseUnits()
     // {
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -152,12 +130,12 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testFactorCompositionFromComposite()
     // {
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
 
-    //     $quantityB = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityB = DerivedPhysicalQuantityFactory::factory(
     //         [$quantityA, new Wonkicity(3, 'u')],
     //         []
     //     );
@@ -190,7 +168,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testUnknownUnitClass()
     // {
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -207,9 +185,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testUnknownUnitClassWithSameUnitCount()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Woogosity(2, 'l'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -226,9 +204,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testUnknownUnitClassWithSameUnitCountDenominatorVariant()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Woogosity(2, 'l')]
     //     );
@@ -243,9 +221,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testKnownUnitClass()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -261,9 +239,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testKnownUnitClassDifferentOrder()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Wigginess(2, 's'), new Woogosity(4, 'l'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -279,9 +257,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testKnownUnitClassWithCoefficientInNumerator()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's'), new DimensionlessCoefficient(12)],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u')]
     //     );
@@ -297,9 +275,9 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //  */
     // public function testKnownUnitClassWithCoefficientInDenominator()
     // {
-    //     AbstractDerivedPhysicalQuantity::registerNewDerivedQuantityClass('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
+    //     DerivedPhysicalQuantityFactory::addDerivedQuantity('PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness');
 
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(3, 'u'), new Wonkicity(3, 'u'), new DimensionlessCoefficient(12)]
     //     );
@@ -308,7 +286,7 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     // }
 
     // /**
-    //  * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getDefinitionComponentQuantites
+    //  * this method doesnt exist anymore
     //  */
     // public function testGetDefinitionComponentQuantites()
     // {
@@ -333,11 +311,12 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     // }
 
     // /**
+    //   this method was made private
     //  * @covers \PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity::getComponentFactors
     //  */
     // public function testGetComponentFactors()
     // {
-    //     $quantityA = AbstractDerivedPhysicalQuantity::factory(
+    //     $quantityA = DerivedPhysicalQuantityFactory::factory(
     //         [new Woogosity(2, 'l'), new Wigginess(4, 's'), new Wigginess(4, 's')],
     //         [new Wonkicity(2, 'u'), new Wonkicity(4, 'u'), new DimensionlessCoefficient(2)]
     //     );

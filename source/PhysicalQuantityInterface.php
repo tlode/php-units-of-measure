@@ -16,6 +16,13 @@ interface PhysicalQuantityInterface
     public function toUnit($unit);
 
     /**
+     * Fetch the measurement in the quantity's native unit of measure
+     *
+     * @return float the measurement cast to the native unit of measurement
+     */
+    public function toNativeUnit();
+
+    /**
      * Display the value as a string, in the original unit of measure
      *
      * @return string The pretty-print version of the value, in the original unit of measure
@@ -51,6 +58,19 @@ interface PhysicalQuantityInterface
      * @return PhysicalQuantityInterface the new quantity
      */
     public function subtract(PhysicalQuantityInterface $quantity);
+
+    /**
+     * Determine whether the given PhysicalQuantityInterface object represents the same
+     * physical quantity as this object.  This is used, for example, to determine if
+     * two quantities can be added to or subtracted from each other.
+     *
+     * Note that this is not considering magnitude, and is only comparing dimensions.
+     *
+     * @param PhysicalQuantityInterface $testQuantity
+     *
+     * @return boolean True if the quantities are the same, false if not.
+     */
+    public function isEquivalentQuantity(PhysicalQuantityInterface $testQuantity);
 
     /**
      * Multiple a given quantity by this quantity, and return a new quantity object.

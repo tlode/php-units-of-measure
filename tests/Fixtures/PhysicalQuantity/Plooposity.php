@@ -2,41 +2,36 @@
 namespace PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity;
 
 use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
-use PhpUnitsOfMeasure\CompoundUnitOfMeasure;
+use PhpUnitsOfMeasure\DerivedUnitOfMeasure;
 
 class Plooposity extends AbstractDerivedPhysicalQuantity
 {
-    protected static $componentQuantities = [
-        ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess'],
-        ['PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity']
-    ];
+    protected static $unitDefinitions;
+    protected static $componentQuantities;
 
-    protected static $unitDefinitions = [];
-
-    protected static $hasBeenInitialized = false;
-
-    protected static function initializeUnitsOfMeasure()
+    protected static function initialize()
     {
-        $native = new CompoundUnitOfMeasure(
+        static::setComponentQuantities(
+            [Wigginess::class],
+            [Wonkicity::class]
+        );
+
+        $native = new DerivedUnitOfMeasure(
             'ho',
-            [
-                ['s'],
-                ['vorp'],
-            ]
+            [Wigginess::getUnit('s')],
+            [Wonkicity::getUnit('vorp')]
         );
         $native->addAlias('horp');
         $native->addAlias('horps');
-        static::registerUnitOfMeasure($native);
+        static::addUnit($native);
 
-        $unit = new CompoundUnitOfMeasure(
+        $unit = new DerivedUnitOfMeasure(
             'je',
-            [
-                ['t'],
-                ['u'],
-            ]
+            [Wigginess::getUnit('t')],
+            [Wonkicity::getUnit('u')]
         );
         $unit->addAlias('jerg');
         $unit->addAlias('jergs');
-        static::registerUnitOfMeasure($unit);
+        static::addUnit($unit);
     }
 }
