@@ -13,7 +13,7 @@ use PhpUnitsOfMeasure\UnitOfMeasure;
  */
 class DimensionlessCoefficient extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions;
+    protected static $registeredUnits;
 
     protected static function initialize()
     {

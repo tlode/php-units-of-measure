@@ -7,7 +7,7 @@ use PhpUnitsOfMeasure\UnitOfMeasure;
 
 class Wigginess extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions;
+    protected static $registeredUnits;
 
     protected static function initialize()
     {

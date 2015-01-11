@@ -6,7 +6,7 @@ use PhpUnitsOfMeasure\DerivedUnitOfMeasure;
 
 class Plooposity extends AbstractDerivedPhysicalQuantity
 {
-    protected static $unitDefinitions;
+    protected static $registeredUnits;
     protected static $componentQuantities;
 
     protected static function initialize()

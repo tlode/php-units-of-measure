@@ -2,94 +2,152 @@
 
 namespace PhpUnitsOfMeasureTest;
 
+use PHPUnit_Framework_TestCase;
 use PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wigginess;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
+use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Plooposity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness;
 use PhpUnitsOfMeasure\PhysicalQuantity\DimensionlessCoefficient;
 
-class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCase
+/**
+ * Because of the large amount of global state preserved in the static
+ * properties of the various physical quantity classes, we'll run
+ * each test in this file its own process.
+ *
+ * @runTestsInSeparateProcesses
+ */
+class AbstractDerivedPhysicalQuantityTest extends PHPUnit_Framework_TestCase
 {
     protected $firstTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Pumpalumpiness';
     protected $secondTestClass = '\PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Plooposity';
 
+
     /**
-     * @before
+     * @dataProvider exceptionProducingUnitsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::addUnit
+     * @expectedException \PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias
      */
-    public function resetStaticProperty()
+    public function testRegisterUnitFailsOnNameCollision($newUnit)
     {
-        parent::resetStaticProperty();
+        $firstTestClass = $this->firstTestClass;
+        $firstTestClass::addUnit($newUnit);
     }
 
-    protected function getTestUnitOfMeasure($name, $aliases = [])
-    {
-        $newUnit = $this->getMock('\PhpUnitsOfMeasure\UnitOfMeasureInterface');
-        $newUnit->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-                $newUnit->expects($this->any())
-            ->method('getAliases')
-            ->will($this->returnValue($aliases));
-
-        return $newUnit;
+    /**
+     * @dataProvider quantityConversionsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
+     */
+    public function testUnitConvertsToArbitraryUnit(
+        AbstractPhysicalQuantity $value,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $this->assertSame($valueInArbitraryUnit, $value->toUnit($arbitraryUnit));
     }
 
-    public function exceptionProducingUnitsProvider()
-    {
-        return [
-            [$this->getTestUnitOfMeasure('fl', [])],                 // name/name collision
-            [$this->getTestUnitOfMeasure('noconflict', ['fl'])],     // alias/name collision
-            [$this->getTestUnitOfMeasure('glergs', [])],             // name/alias collision
-            [$this->getTestUnitOfMeasure('noconflict', ['glergs'])], // alias/alias collision
-        ];
+    /**
+     * @dataProvider quantityConversionsProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
+     * @expectedException \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure
+     */
+    public function testConvertToUnknownUnitThrowsException(
+        AbstractPhysicalQuantity $value,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $value->toUnit('someUnknownUnit');
     }
 
-    public function quantityConversionsProvider()
+    /**
+     * @dataProvider toStringProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::__toString
+     */
+    public function testToString(AbstractPhysicalQuantity $value, $string)
     {
-        return [
-            [new Pumpalumpiness(2, 'fl'), 'fl', 2],
-            [new Pumpalumpiness(2, 'fl'), 'gl', 2/1.234],
-            [new Pumpalumpiness(2, 'gl'), 'fl', 2*1.234],
-            [new Pumpalumpiness(2, 'gl'), 'gl', 2.0]
-        ];
+        $this->assertSame($string, (string) $value);
     }
 
-    public function toStringProvider()
-    {
-        return [
-            [new Pumpalumpiness(2, 'fl'), '2 fl'],
-            [new Pumpalumpiness(2, 'floops'), '2 fl'],
-            [new Pumpalumpiness(2, 'gl'), '2 gl'],
-            [new Pumpalumpiness(2, 'glerg'), '2 gl'],
-        ];
+    /**
+     * @dataProvider arithmeticProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
+     */
+    public function testAdd(
+        $shouldThrowException,
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $sumString,
+        $diffString
+    ) {
+        if ($shouldThrowException) {
+            $this->setExpectedException('\PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
+        }
+
+        $sum = $firstValue->add($secondValue);
+
+        if (!$shouldThrowException) {
+            $this->assertSame($sumString, (string) $sum);
+        }
     }
 
-    public function arithmeticProvider()
-    {
-        return [
-            [false, new Pumpalumpiness(2, 'fl'), new Pumpalumpiness(2.5, 'fl'), '4.5 l', '-0.5 l'],
-            [true,  new Pumpalumpiness(2, 'fl'), new Plooposity(2, 'ho'), '', ''],
-        ];
+    /**
+     * @dataProvider arithmeticProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::subtract
+     */
+    public function testSubtract(
+        $shouldThrowException,
+        AbstractPhysicalQuantity $firstValue,
+        AbstractPhysicalQuantity $secondValue,
+        $sumString,
+        $diffString
+    ) {
+        if ($shouldThrowException) {
+            $this->setExpectedException('\PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
+        }
+
+        $difference = $firstValue->subtract($secondValue);
+
+        if (!$shouldThrowException) {
+            $this->assertSame($diffString, (string) $difference);
+        }
     }
 
-    public function productProvider()
-    {
-        return [
-            [
-                new Pumpalumpiness(2, 'l'),
-                new Pumpalumpiness(4, 'l'),
-                '8 l^2',
-                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity',
-                '0.5',
-                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity'
-            ],
-        ];
-    }
+    // /**
+    //  * @dataProvider productProvider
+    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::multiplyBy
+    //  */
+    // public function testMultiplyBy(
+    //     AbstractPhysicalQuantity $firstValue,
+    //     AbstractPhysicalQuantity $secondValue,
+    //     $productString,
+    //     $productType,
+    //     $quotientString,
+    //     $quotientType
+    // ) {
+    //     $product = $firstValue->multiplyBy($secondValue);
 
-    // ************************************************************************
-    // *** Here ends the shared tests from AbstractPhysicalQuantityTestCase ***
-    // ************************************************************************
+    //     $this->assertInstanceOf($productType, $product);
+    //     $this->assertSame($productString, (string) $product);
+    // }
+
+    // /**
+    //  * @dataProvider productProvider
+    //  * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::divideBy
+    //  */
+    // public function testDivideBy(
+    //     AbstractPhysicalQuantity $firstValue,
+    //     AbstractPhysicalQuantity $secondValue,
+    //     $productString,
+    //     $productType,
+    //     $quotientString,
+    //     $quotientType
+    // ) {
+    //     $quotient = $firstValue->divideBy($secondValue);
+
+    //     $this->assertInstanceOf($quotientType, $quotient);
+    //     $this->assertSame($quotientString, (string) $quotient);
+    // }
 
     // /**
     // get component factors was made private
@@ -325,5 +383,86 @@ class AbstractDerivedPhysicalQuantityTest extends AbstractPhysicalQuantityTestCa
     //     // Kind of a weak test, but at least we can verify the counts are right
     //     $this->assertEquals(4, count($factors[0]));
     //     $this->assertEquals(2, count($factors[1]));
+    // }
+    //
+    //
+    //
+    //
+    protected function getTestUnitOfMeasure($name, $aliases = [])
+    {
+        $newUnit = $this->getMock('\PhpUnitsOfMeasure\UnitOfMeasureInterface');
+        $newUnit->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+                $newUnit->expects($this->any())
+            ->method('getAliases')
+            ->will($this->returnValue($aliases));
+
+        return $newUnit;
+    }
+
+    public function exceptionProducingUnitsProvider()
+    {
+        return [
+            [$this->getTestUnitOfMeasure('fl', [])],                 // name/name collision
+            [$this->getTestUnitOfMeasure('noconflict', ['fl'])],     // alias/name collision
+            [$this->getTestUnitOfMeasure('glergs', [])],             // name/alias collision
+            [$this->getTestUnitOfMeasure('noconflict', ['glergs'])], // alias/alias collision
+        ];
+    }
+
+    public function quantityConversionsProvider()
+    {
+        return [
+            [new Pumpalumpiness(2, 'fl'), 'fl', 2],
+            [new Pumpalumpiness(2, 'fl'), 'gl', 2/1.234],
+            [new Pumpalumpiness(2, 'gl'), 'fl', 2*1.234],
+            [new Pumpalumpiness(2, 'gl'), 'gl', 2.0]
+        ];
+    }
+
+    public function toStringProvider()
+    {
+        return [
+            [new Pumpalumpiness(2, 'fl'), '2 fl'],
+            [new Pumpalumpiness(2, 'floops'), '2 fl'],
+            [new Pumpalumpiness(2, 'gl'), '2 gl'],
+            [new Pumpalumpiness(2, 'glerg'), '2 gl'],
+        ];
+    }
+
+    public function arithmeticProvider()
+    {
+        return [
+            [false, new Pumpalumpiness(2, 'fl'), new Pumpalumpiness(2.5, 'fl'), '4.5 l', '-0.5 l'],
+            [true,  new Pumpalumpiness(2, 'fl'), new Plooposity(2, 'ho'), '', ''],
+        ];
+    }
+
+    public function productProvider()
+    {
+        return [
+            [
+                new Pumpalumpiness(2, 'l'),
+                new Pumpalumpiness(4, 'l'),
+                '8 l^2',
+                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity',
+                '0.5',
+                '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity'
+            ],
+        ];
+    }
+
+    /**
+     * Assert that two arrays have the same values, regardless of the order.
+     *
+     * @param  array  $expected
+     * @param  array  $actual
+     */
+    // public function assertArraySameValues(array $expected, array $actual)
+    // {
+    //     asort($expected);
+    //     asort($actual);
+    //     $this->assertSame($expected, $actual);
     // }
 }

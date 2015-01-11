@@ -9,7 +9,7 @@ class Temperature extends AbstractPhysicalQuantity
 {
     use HasSIUnitsTrait;
 
-    protected static $unitDefinitions;
+    protected static $registeredUnits;
 
     protected static function initialize()
     {

@@ -6,7 +6,7 @@ use PhpUnitsOfMeasure\UnitOfMeasure;
 
 class Volume extends AbstractPhysicalQuantity
 {
-    protected static $unitDefinitions;
+    protected static $registeredUnits;
 
     protected static function initialize()
     {

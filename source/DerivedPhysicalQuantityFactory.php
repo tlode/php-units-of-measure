@@ -15,14 +15,14 @@ abstract class DerivedPhysicalQuantityFactory
      *
      * @var string[]
      */
-    private static $derivedQuantityClasses = [
-        // @TODO - enable this list of classes
-        // '\PhpUnitsOfMeasure\PhysicalQuantity\Acceleration',
-        // '\PhpUnitsOfMeasure\PhysicalQuantity\Area',
-        // '\PhpUnitsOfMeasure\PhysicalQuantity\Pressure',
-        // '\PhpUnitsOfMeasure\PhysicalQuantity\Velocity',
-        // '\PhpUnitsOfMeasure\PhysicalQuantity\Volume',
-    ];
+    // private static $derivedQuantityClasses = [
+    //     // @TODO - enable this list of classes
+    //     // '\PhpUnitsOfMeasure\PhysicalQuantity\Acceleration',
+    //     // '\PhpUnitsOfMeasure\PhysicalQuantity\Area',
+    //     // '\PhpUnitsOfMeasure\PhysicalQuantity\Pressure',
+    //     // '\PhpUnitsOfMeasure\PhysicalQuantity\Velocity',
+    //     // '\PhpUnitsOfMeasure\PhysicalQuantity\Volume',
+    // ];
 
     /**
      * Register a new derived physical quantity class in the list of known classes.
@@ -33,18 +33,18 @@ abstract class DerivedPhysicalQuantityFactory
      *
      * @param string $className The fully qualified class name of the new derived quantity
      */
-    final public static function addDerivedQuantity($className)
-    {
-        if (in_array($className, self::$derivedQuantityClasses)) {
-            return;
-        }
+    // final public static function addDerivedQuantity($className)
+    // {
+    //     if (in_array($className, self::$derivedQuantityClasses)) {
+    //         return;
+    //     }
 
-        if (!class_exists($className) || !is_subclass_of($className, '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity')) {
-            throw new Exception\DerivedQuantitiesMustExtendParent;
-        }
+    //     if (!class_exists($className) || !is_subclass_of($className, '\PhpUnitsOfMeasure\AbstractDerivedPhysicalQuantity')) {
+    //         throw new Exception\DerivedQuantitiesMustExtendParent;
+    //     }
 
-        self::$derivedQuantityClasses[] = $className;
-    }
+    //     self::$derivedQuantityClasses[] = $className;
+    // }
 
     /**
      * Given a set of numerator and denominator quantities, instantiate and return
@@ -70,11 +70,11 @@ abstract class DerivedPhysicalQuantityFactory
         );
 
         // Attempt to find a derived class that represents the same collection of units
-        foreach (self::$derivedQuantityClasses as $className) {
-            if ($className::factorsMatchQuantityComponents($numerators, $denominators)) {
-                return new $className($numerators, $denominators);
-            }
-        }
+        // foreach (self::$derivedQuantityClasses as $className) {
+        //     if ($className::factorsMatchQuantityComponents($numerators, $denominators)) {
+        //         return new $className($numerators, $denominators);
+        //     }
+        // }
 
         // No derived class was found with these units, use the catchall type
         return new UnknownDerivedPhysicalQuantity($numerators, $denominators);
