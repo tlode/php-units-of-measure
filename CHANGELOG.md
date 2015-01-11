@@ -18,7 +18,7 @@
 - Add support for automatically generating metric-prefixed units from a single base unit
 - Throw an exception on registering units of measure with names or aliases that collide with existing units on that quantity
 - Disallow values that aren't numerical and unit names that aren't strings (ie, type checking)
-- Add new method getSupportedUnitNames() to Physical Quantities
+- Add new method getSupportedUnits() to Physical Quantities
 - Add new method getAliases() to Units of Measure
 - Add arcminute and arcsecond as angle units
 - Add all SI prefix units to meters, kilograms, seconds, amps, kelvin, candela, pascal, bar, radians, degrees, and arcseconds
