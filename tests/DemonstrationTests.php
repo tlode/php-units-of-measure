@@ -32,6 +32,7 @@ use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
  * Because of the large amount of global state preserved in the static
  * properties of the various physical quantity classes, we'll run
  * each test in this file its own process.
+ *
  * @runTestsInSeparateProcesses
  */
 class DemonstrationTests extends PHPUnit_Framework_TestCase
@@ -177,13 +178,14 @@ class DemonstrationTests extends PHPUnit_Framework_TestCase
         $a = new Woogosity(21, 'plurp');
 
         $this->assertInstanceOf(Woogosity::class, $a);
-        $this->assertSame(21*3.5 * 1e3, $a->toUnit('millilupees'));
-        $this->assertSame(21*3.5 * 1e3, $a->toUnit('ml'));
-        $this->assertSame(21*3.5 / 1e6, $a->toUnit('megalupees'));
-        $this->assertSame(21*3.5 / 1e6, $a->toUnit('Ml'));
+        $this->assertSame(21*4.5 * 1e3, $a->toUnit('millilupees'));
+        $this->assertSame(21*4.5 * 1e3, $a->toUnit('ml'));
+        $this->assertSame(21*4.5 / 1e6, $a->toUnit('megalupees'));
+        $this->assertSame(21*4.5 / 1e6, $a->toUnit('Ml'));
     }
 
     public function testAddBaseQuantities()
+
     {
         // Two quantities of equivalent value can be summed
         // by calling the add method.

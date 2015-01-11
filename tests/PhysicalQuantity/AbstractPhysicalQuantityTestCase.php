@@ -2,7 +2,12 @@
 
 namespace PhpUnitsOfMeasureTest\PhysicalQuantity;
 
-abstract class AbstractPhysicalQuantityTestCase extends \PHPUnit_Framework_TestCase
+use PHPUnit_Framework_TestCase;
+
+/**
+ * This is a parent class for all the PhysicalQuantity childrens' test cases.
+ */
+abstract class AbstractPhysicalQuantityTestCase extends PHPUnit_Framework_TestCase
 {
     protected $supportedUnitsWithAliases = [];
 
@@ -12,6 +17,19 @@ abstract class AbstractPhysicalQuantityTestCase extends \PHPUnit_Framework_TestC
     public function testConstructorSucceeds()
     {
         $this->instantiateTestQuantity();
+    }
+
+    /**
+     * Convert to each of the known supported units, verifying that no
+     * exceptions are thrown.
+     */
+    public function testSupportedUnits()
+    {
+        $quantity = $this->instantiateTestQuantity();
+
+        foreach ($this->supportedUnitsWithAliases as $unit) {
+            $quantity->toUnit($unit);
+        }
     }
 
     /**

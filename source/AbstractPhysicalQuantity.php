@@ -23,7 +23,7 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
     {
         if (static::unitNameOrAliasesAlreadyRegistered($unit)) {
             throw new Exception\DuplicateUnitNameOrAlias([
-                ':labels' => implode(', ', [$unit->getName()] + $unit->getAliases())
+                ':labels' => implode(', ', array_merge([$unit->getName()], $unit->getAliases()))
             ]);
         }
 
@@ -72,15 +72,15 @@ abstract class AbstractPhysicalQuantity implements PhysicalQuantityInterface
             static::initialize();
         }
 
-        $newUnitNamesAndAliases = [$unit->getName()] + $unit->getAliases();
-
         $currentUnitNamesAndAliases = [];
         foreach (static::$unitDefinitions as $unitOfMeasure) {
             $currentUnitNamesAndAliases[] = $unitOfMeasure->getName();
-            $currentUnitNamesAndAliases += $unitOfMeasure->getAliases();
+            $currentUnitNamesAndAliases = array_merge($currentUnitNamesAndAliases, $unitOfMeasure->getAliases());
         }
 
-        return array_intersect($newUnitNamesAndAliases, $currentUnitNamesAndAliases) !== [];
+        $newUnitNamesAndAliases = array_merge([$unit->getName()], $unit->getAliases());
+
+        return count(array_intersect($currentUnitNamesAndAliases, $newUnitNamesAndAliases)) > 0;
     }
 
     /**
