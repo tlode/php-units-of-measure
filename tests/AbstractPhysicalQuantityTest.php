@@ -24,7 +24,7 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
 {
     protected function getTestUnitOfMeasure($name, $aliases = [])
     {
-        $newUnit = $this->getMockBuilder(UnitOfMeasureInterface::class)
+        $newUnit = $this->getMockBuilder('PhpUnitsOfMeasure\UnitOfMeasureInterface')
             ->getMock();
         $newUnit->method('getName')
             ->willReturn($name);
@@ -136,6 +136,31 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     *
+     * @dataProvider quantityConversionsProvider
+     */
+    public function testSerialize(
+        AbstractPhysicalQuantity $value,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        serialize($value);
+    }
+
+    /**
+     * @dataProvider quantityConversionsProvider
+     */
+    public function testUnserialize(
+        AbstractPhysicalQuantity $value,
+        $arbitraryUnit,
+        $valueInArbitraryUnit
+    ) {
+        $unserializedValue = unserialize(serialize($value));
+
+        $this->assertSame($valueInArbitraryUnit, $unserializedValue->toUnit($arbitraryUnit));
+    }
+
+    /**
      * @dataProvider arithmeticProvider
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::add
      */
@@ -147,7 +172,7 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
         $diffString
     ) {
         if ($shouldThrowException) {
-            $this->setExpectedException(PhysicalQuantityMismatch::class);
+            $this->setExpectedException('PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
         }
 
         $sum = $firstValue->add($secondValue);
@@ -169,7 +194,7 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
         $diffString
     ) {
         if ($shouldThrowException) {
-            $this->setExpectedException(PhysicalQuantityMismatch::class);
+            $this->setExpectedException('PhpUnitsOfMeasure\Exception\PhysicalQuantityMismatch');
         }
 
         $difference = $firstValue->subtract($secondValue);
@@ -206,7 +231,9 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
             [new Wonkicity(2, 'u'), 'u', 2],
             [new Wonkicity(2, 'u'), 'vorps', 2/3.5],
             [new Wonkicity(2, 'vorps'), 'u', 2*3.5],
-            [new Wonkicity(2, 'vorps'), 'vorps', 2.0]
+            [new Wonkicity(2, 'vorps'), 'vorps', 2.0],
+            [new Woogosity(2, 'p'), 'lupees', 2*4.5],
+            [new Woogosity(2, 'p'), 'millilupees', 2*4.5*1000],
         ];
     }
 
@@ -222,6 +249,8 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
             [new Wonkicity(2, 'uvee'), '2 u'],
             [new Wonkicity(2, 'v'), '2 v'],
             [new Wonkicity(2, 'vorps'), '2 v'],
+            [new Woogosity(2, 'plurps'), '2 p'],
+            [new Woogosity(2, 'millilupees'), '2 ml'],
         ];
     }
 
