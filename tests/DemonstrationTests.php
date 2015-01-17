@@ -224,7 +224,7 @@ class DemonstrationTests extends PHPUnit_Framework_TestCase
         $b = new Wonkicity(2, 'uvee');
         $c = $a->multiplyBy($b);
 
-        $this->assertInstanceOf(UnknownDerivedPhysicalQuantity::class, $c);
+        $this->assertInstanceOf('PhpUnitsOfMeasure\PhysicalQuantity\UnknownDerivedPhysicalQuantity', $c);
         $this->assertSame((3 * 2).' s * u', (string) $c);
     }
 
@@ -238,7 +238,7 @@ class DemonstrationTests extends PHPUnit_Framework_TestCase
         $b = new Wonkicity(2, 'uvee');
         $c = $a->divideBy($b);
 
-        $this->assertInstanceOf(UnknownDerivedPhysicalQuantity::class, $c);
+        $this->assertInstanceOf('PhpUnitsOfMeasure\PhysicalQuantity\UnknownDerivedPhysicalQuantity', $c);
         $this->assertSame((3 / 2).' s / u', (string) $c);
     }
 
