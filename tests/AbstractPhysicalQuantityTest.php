@@ -10,6 +10,7 @@ use PhpUnitsOfMeasure\Exception\DuplicateUnitNameOrAlias;
 use PhpUnitsOfMeasure\Exception\NonNumericValue;
 use PhpUnitsOfMeasure\Exception\NonStringUnitName;
 use PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure;
+use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\InvalidQuantity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Wonkicity;
 use PhpUnitsOfMeasureTest\Fixtures\PhysicalQuantity\Woogosity;
 
@@ -57,22 +58,22 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getUnit
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getUnitByNameOrAlias
      */
     public function testGetUnit()
     {
-        $unit = Wonkicity::getUnit('u');
+        $unit = Wonkicity::getUnitByNameOrAlias('u');
 
         $this->assertSame('u', $unit->getName());
     }
 
     /**
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getUnit
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::getUnitByNameOrAlias
      * @expectedException \PhpUnitsOfMeasure\Exception\UnknownUnitOfMeasure
      */
     public function testGetUnitFailsOnUnknownUnit()
     {
-        Wonkicity::getUnit('someUnknownUnit');
+        Wonkicity::getUnitByNameOrAlias('someUnknownUnit');
     }
 
     /**
@@ -101,6 +102,19 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
         $value = new Wonkicity(1.234, 42);
     }
 
+    public function testGetOriginalValue()
+    {
+        $value = new Wonkicity(1.234, 'u');
+        $this->assertEquals(1.234, $value->getValue());
+    }
+
+    public function testGetOriginalUnit()
+    {
+        $value = new Wonkicity(1.234, 'u');
+        $this->assertEquals('u', $value->getUnit()->getName());
+    }
+
+
     /**
      * @dataProvider quantityConversionsProvider
      * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
@@ -116,14 +130,29 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider quantityConversionsProvider
-     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toUnit
      */
     public function testUnitConvertsToArbitraryUnit(
         AbstractPhysicalQuantity $value,
         $arbitraryUnit,
         $valueInArbitraryUnit
     ) {
-        $this->assertSame($valueInArbitraryUnit, $value->toUnit($arbitraryUnit));
+        $this->assertSame($valueInArbitraryUnit, $value->toUnit($arbitraryUnit)->getValue());
+    }
+
+    /**
+     * @dataProvider nativeUnitProvider
+     * @covers \PhpUnitsOfMeasure\AbstractPhysicalQuantity::toNativeUnit
+     */
+    public function testToNativeUnit(
+        $shouldThrowException,
+        AbstractPhysicalQuantity $value,
+        $nativeUnit
+    ) {
+        if ($shouldThrowException) {
+            $this->setExpectedException('PhpUnitsOfMeasure\Exception\UndefinedNativeUnitOfMeasure');
+        }
+        $this->assertSame($nativeUnit, $value->toNativeUnit()->getUnit()->getName());
     }
 
     /**
@@ -157,7 +186,7 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
     ) {
         $unserializedValue = unserialize(serialize($value));
 
-        $this->assertSame($valueInArbitraryUnit, $unserializedValue->toUnit($arbitraryUnit));
+        $this->assertSame($valueInArbitraryUnit, $unserializedValue->toUnit($arbitraryUnit)->getValue());
     }
 
     /**
@@ -234,6 +263,25 @@ class AbstractPhysicalQuantityTest extends PHPUnit_Framework_TestCase
             [new Wonkicity(2, 'vorps'), 'vorps', 2.0],
             [new Woogosity(2, 'p'), 'lupees', 2*4.5],
             [new Woogosity(2, 'p'), 'millilupees', 2*4.5*1000],
+        ];
+    }
+
+    /**
+     * Provide native unit testing data
+     * 1) the object from which to start
+     * 2) The expected native unit
+     */
+    public function nativeUnitProvider()
+    {
+        return [
+            [false, new Wonkicity(2, 'u'), 'u'],
+            [false, new Wonkicity(2, 'uvee'), 'u'],
+            [false, new Wonkicity(2, 'vorp'), 'u'],
+            [false, new Wonkicity(2, 'vorps'), 'u'],
+            [false, new Woogosity(2, 'lupee'), 'l'],
+            [false, new Woogosity(2, 'p'), 'l'],
+            [false, new Woogosity(2, 'plurp'), 'l'],
+            [true, new InvalidQuantity(2, 'x'), 'x']
         ];
     }
 
